@@ -5,6 +5,14 @@ ob_start();
 error_reporting(0);
 ini_set('display_errors', 0);
 
+// Inclui os arquivos do PHPMailer
+require '../PHPMailer/src/Exception.php';
+require '../PHPMailer/src/PHPMailer.php';
+require '../PHPMailer/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 header('Content-Type: application/json');
 
 function validarSenha($senha){
@@ -25,7 +33,36 @@ function validarDataNasc($data_nasc){
     $regexData = '/^\d{4}-\d{2}-\d{2}$/'; 
     return preg_match($regexData, $data_nasc);
 }
+//EMAILLLLL
+function enviarEmailConfirmacao($email, $token) {
+    $mail = new PHPMailer(true);
+    try {
+        // Configuração do servidor SMTP
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'buscavetpucpr@gmail.com'; // Substitua pelo seu e-mail
+        $mail->Password = 'emdy mihd aoeo pxut';           // Substitua pela sua senha
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
 
+        // Definir remetente e destinatário
+        $mail->setFrom('buscavetpucpr@gmail.com', 'BuscaVet');
+        $mail->addAddress($email);
+
+        // Conteúdo do e-mail
+        $mail->isHTML(true);
+        $mail->Subject = 'Confirmação de Cadastro';
+        $mail->Body    = "Clique aqui para confirmar seu cadastro: <a href='http://localhost/php/confirmar_usuario.php?token={$token}'>Confirmar Cadastro</a>";
+
+        // Enviar o e-mail
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Erro ao enviar e-mail: {$mail->ErrorInfo}");
+        return false;
+    }
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $con = mysqli_connect("localhost", "root", "", "buscavet");
@@ -75,25 +112,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $cpf,
             $passwordHashed);
 
-        if (mysqli_stmt_execute($stmt)) {
-            ob_end_clean();
-            echo json_encode(["mensagem" => "Usuário cadastrado com sucesso!"]);
+            if (mysqli_stmt_execute($stmt)) {
+                $token = bin2hex(random_bytes(50)); // Gera um token seguro
+                // Salva o token na base de dados
+                $updateTokenStmt = mysqli_prepare($con, "UPDATE usuario SET token = ? WHERE email = ?");
+                mysqli_stmt_bind_param($updateTokenStmt, 'ss', $token, $email);
+                mysqli_stmt_execute($updateTokenStmt);
+                mysqli_stmt_close($updateTokenStmt);
+    
+                // Enviar e-mail de confirmação
+                if (enviarEmailConfirmacao($email, $token)) {
+                    ob_end_clean();
+                    echo json_encode(["mensagem" => "Usuário cadastrado com sucesso! E-mail de confirmação enviado."]);
+                } else {
+                    ob_end_clean();
+                    echo json_encode(["mensagem" => "Usuário cadastrado. Erro ao enviar e-mail de confirmação."]);
+                }
+            } else {
+                ob_end_clean();
+                echo json_encode(["mensagem" => "Erro ao cadastrar o usuário: " . mysqli_stmt_error($stmt)]);
+            }
+    
+            mysqli_stmt_close($stmt);
+            mysqli_close($con);
         } else {
             ob_end_clean();
-            echo json_encode(["mensagem" => "Erro ao cadastrar o usuário: " . mysqli_stmt_error($stmt)]);
+            echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . mysqli_connect_error()]);
         }
-
-        mysqli_stmt_close($stmt);
-        mysqli_close($con);
     } else {
         ob_end_clean();
-        echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . mysqli_connect_error()]);
+        echo json_encode(["mensagem" => "Método de requisição inválido."]);
     }
-} else {
-    ob_end_clean();
-    echo json_encode(["mensagem" => "Método de requisição inválido."]);
-}
-
-ob_end_flush();
+    
+    ob_end_flush();
+    
+    ?>
 
 ?>

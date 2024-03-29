@@ -2,8 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const usuarioForm = document.getElementById("form-cadastro");
 
     function validarCPF(cpf) {
-        // Adicione aqui a lógica de validação de CPF
-        // Este é um exemplo simples e pode não ser adequado para a validação completa de CPF
         cpf = cpf.replace(/[^\d]+/g,'');
         if(cpf === '') return false;
         // Elimina CPFs invalidos conhecidos
@@ -50,6 +48,15 @@ document.addEventListener("DOMContentLoaded", function () {
         return emailRegex.test(email);
     }
 
+    document.getElementById('cpf').addEventListener('input', function(e) {
+        var valor = e.target.value.replace(/\D/g, '');
+        valor = valor.replace(/(\d{3})(\d)/, '$1.$2'); 
+        valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+        valor = valor.replace(/(\d{3})(\d{1,2})/, '$1-$2'); 
+        valor = valor.substring(0, 14);
+        e.target.value = valor;
+    });
+
     usuarioForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
@@ -57,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const login = document.getElementById("login").value;
         const email = document.getElementById("email").value;
         const cpf = document.getElementById("cpf").value;
+        const data_nasc = document.getElementById("data_nasc").value;
         const password = document.getElementById("password").value;
         const check_password = document.getElementById("check_password").value;
 
@@ -80,6 +88,11 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        if (!data_nasc.trim()) {
+            alert("Por favor, preencha o campo de data de nascimento.");
+            return;
+        }
+
         if (!validarSenha(password)) {
             alert("A senha não atende aos requisitos mínimos.");
             return;
@@ -96,12 +109,21 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "POST",
             body: formData
         })
-        .then(response => response.json())
+        
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                // This will handle any non-JSON responses, including HTML error pages
+                return response.text().then(text => { throw new Error(text) });
+            }
+        })
         .then(data => {
             alert(data.mensagem);
         })
         .catch(error => {
-            alert("Erro ao cadastrar o usuário: " + error);
+            // This will catch errors from the above .then() or any network errors
+            alert("Erro ao cadastrar o usuário: " + error.message);
         });
     });
 });

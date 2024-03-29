@@ -2,8 +2,8 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../css/style.css">
-    <script src="../js/cadastro_usuario.js"></script>
-  <title> BuscaVet - Cadastro </title>
+    <script src="../js/cadastro_clinica.js"></script>
+  <title> BuscaVet - Cadastro Clinic</title>
   <link rel="icon" href="/img/Logo.png">
 </head>
  
@@ -22,12 +22,11 @@
                 <li><a href="autenticacao.html" class="link">AUTENTICACAO</a></li>
               </ul>
 
-      </header>
+            </header>
  
-    <h1 id="titulo_geral">Cadastro</h1>
- 
-    <div id="cadastro" class="cadastro">
-        <form id="form-cadastro" action="#" method="post" class="form-cadastro">
+    <h1 id="titulo_geral">Cadastro - Veterinário</h1> 
+<div id="cadastro-clinica" class="cadastro-clinica">
+        <form id="form-cadastro-clinica" action="#" method="post" class="form-cadastro-clinica">
             <div class="input-container">
                 <label for="name">Nome</label>
                 <input type="text" name="name" id="name" required>
@@ -35,29 +34,30 @@
             <div class="input-container">
               <label for="email">Login<label>
               <input type="text" name="login" id="login" required>
-          </div>
-            <div class="input-container">
-                <label for="email">E-mail<label>
-                <input type="text" name="email" id="email" required>
             </div>
             <div class="input-container">
-                <label for="cpf">CPF<label>
-                <input type="text" name="cpf" id="cpf" placeholder="123.456.789-00" required>
+                <label for="crmv">CRMV</label>
+                <input type="text" name="crmv" id="crmv" placeholder="00.000.000/0001-00" required>
             </div>
+
             <div class="input-container">
-              <label for="cpf">Data de nascimento<label>
-              <input type="date" name="data_nasc" id="data_nasc" required>
-            </div>            
-            <div class="input-container">
-                <label for="password">Digite sua nova senha</label>
-                <input type="password" name="password" id="password" required>
-            </div>
-            <div class="input-container">
-                <label for="check_password">Repita a senha<label>
-                <input type="password" name="check_password" id="check_password" required>
-            </div>
-            <button type="submit">Gravar</button>
-        </form>
+            <label for="email">E-mail<label>
+            <input type="text" name="email" id="email" required>
+        </div>
+        <div class="input-container">
+            <label for="cnpj">CNPJ<label>
+            <input type="text" name="cnpj" id="cnpj" required>
+        </div>
+        <div class="input-container">
+            <label for="password">Digite sua nova senha</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+        <div class="input-container">
+            <label for="check_password">Repita a senha<label>
+            <input type="password" name="check_password" id="check_password" required>
+        </div>
+        <button type="submit">Gravar</button>
+    </form>
     </div>
 
 

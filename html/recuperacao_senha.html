@@ -2,10 +2,12 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../css/style.css">
-  <title> BuscaVet - Login </title>
-  <link rel="icon" href="/img/Logo.png">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../js/administrador.js"></script>
+    <title> BuscaVet - Recuperação de Senha </title>
+    <link rel="icon" href="/img/Logo.png">
 </head>
- 
+
   <body style="background-image: url('../img/BuscaVetLogo.png');">
     <header class="cabecalho">
         <div class="juntos">
@@ -21,28 +23,20 @@
                 <li><a href="autenticacao.html" class="link">AUTENTICACAO</a></li>
             </ul>
 
-      </header>
- 
-    <h1 id="titulo_geral">Login</h1>
- 
-    <div id="login" class="login">
-        <form id="form-login" action="#" method="post" class="form-login">
+    </header>
+
+    <h1 id="titulo_geral">Recuperação de senha</h1>
+
+    <div id="rec-senha" class="rec-senha">
+        <form id="form-rec-senha" action="#" method="post" class="form-rec-senha">
             <div class="input-container">
-                <label for="email">E-mail<label>
+                <label for="email">Digite seu e-mail</label>
                 <input type="text" name="email" id="email" required>
             </div>
-            <div class="input-container">
-                <label for="password">Senha<label>
-                <input type="password" name="password" id="password" required>
-            </div>
-            <a href="cadastro_usuario.html" class="link">Cadastre-se | Cliente</a>
-            <a href="cadastro_clinica.html" class="link">Cadastre-se | Clinica</a>
-            <a href="autenticacao.html" class="link">Esqueci minha senha</a>
-            <hr>
-            <button type="submit">Login</button>
+            <button type="submit">Recuperar senha</button>
         </form>
     </div>
 
 
-  </body>
+</body>
 </html>

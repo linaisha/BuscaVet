@@ -5,6 +5,7 @@ body {
   background-position: center 20%;
   }
 
+
 .cabecalho {
   background: linear-gradient(to bottom, #40ae2a, #f9d72f);
   padding: 5px;
@@ -15,6 +16,7 @@ body {
   box-shadow: 0px 7px 5px 1px #f9d72f;
   margin-bottom: 8px;
 }
+
 
   .logo {
     display: flex;
@@ -68,6 +70,7 @@ body {
   }
   .form-rec-senha,
   .form-cadastro,
+  .form-cadastro-clinica,
   .form-login,
   .form-nova-senha,
   .form-token{ animation: fadeIn 3s; }
@@ -76,8 +79,10 @@ body {
     50% {opacity: 3;}
     100% {opacity: 5;}}
 
+
   .form-rec-senha,
   .form-cadastro,
+  .form-cadastro-clinica,
   .form-login,
   .form-nova-senha,
   .form-token{
@@ -89,6 +94,7 @@ body {
     font-family: Bradley Hand, cursive;
     border: 2px solid black;
   } 
+
 
   #titulo_geral{
     font-family: Bradley Hand, cursive;
@@ -114,6 +120,7 @@ body {
  
   .rec-senha,
   .cadastro,
+  .cadastro-clinica,
   .login,
   .nova-senha,
   .token {
@@ -147,8 +154,10 @@ body {
     box-shadow: 1px 5px 5px 1px black;
   }
 
+
   form.form-rec-senha,
   form.form-cadastro,
+  form.form-cadastro-clinica,
   form.form-login,
   form.form-nova-senha,
   form.form-token{

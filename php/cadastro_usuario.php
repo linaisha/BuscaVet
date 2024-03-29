@@ -39,13 +39,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = $_POST['password'];
 
         if (!validarEmail($email)) {
-            ob_end_clean(); // Clean any other output in the buffer
+            ob_end_clean();
             echo json_encode(["mensagem" => "E-mail inválido."]);
             exit;
         }
 
         if (!validarCpfCnpj($cpf)) {
-            ob_end_clean(); // Clean any other output in the buffer
+            ob_end_clean();
             echo json_encode(["mensagem" => "CPF/CNPJ inválido."]);
             exit;
         }
@@ -54,13 +54,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         error_log("Validating date of birth: " . $data_nasc);
 
         if (!validarDataNasc($data_nasc)) {
-            ob_end_clean(); // Clean any other output in the buffer
+            ob_end_clean();
             echo json_encode(["mensagem" => "Data de nascimento inválida."]);
             exit;
         }
 
         if (!validarSenha($password)) {
-            ob_end_clean(); // Clean any other output in the buffer
+            ob_end_clean();
             echo json_encode(["mensagem" => "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúsculo, uma letra minúscula, um número e um caractere especial."]);
             exit;
         }
@@ -76,24 +76,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $passwordHashed);
 
         if (mysqli_stmt_execute($stmt)) {
-            ob_end_clean(); // Clean any other output in the buffer
+            ob_end_clean();
             echo json_encode(["mensagem" => "Usuário cadastrado com sucesso!"]);
         } else {
-            ob_end_clean(); // Clean any other output in the buffer
+            ob_end_clean();
             echo json_encode(["mensagem" => "Erro ao cadastrar o usuário: " . mysqli_stmt_error($stmt)]);
         }
 
         mysqli_stmt_close($stmt);
         mysqli_close($con);
     } else {
-        ob_end_clean(); // Clean any other output in the buffer
+        ob_end_clean();
         echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . mysqli_connect_error()]);
     }
 } else {
-    ob_end_clean(); // Clean any other output in the buffer
+    ob_end_clean();
     echo json_encode(["mensagem" => "Método de requisição inválido."]);
 }
 
-ob_end_flush(); // Flush the buffer here if the end is reached without exiting
+ob_end_flush();
 
 ?>

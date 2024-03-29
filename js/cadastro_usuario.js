@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function validarCPF(cpf) {
         cpf = cpf.replace(/[^\d]+/g,'');
         if(cpf === '') return false;
-        // Elimina CPFs invalidos conhecidos
         if (cpf.length !== 11 || 
             cpf === "00000000000" || 
             cpf === "11111111111" || 
@@ -16,8 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
             cpf === "77777777777" || 
             cpf === "88888888888" || 
             cpf === "99999999999")
-                return false;       
-        // Valida 1o digito
+                return false;      
         let add = 0;
         for (let i=0; i < 9; i ++)       
             add += parseInt(cpf.charAt(i)) * (10 - i);  
@@ -26,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
             rev = 0;    
         if (rev !== parseInt(cpf.charAt(9)))     
             return false;       
-        // Valida 2o digito
         add = 0;
         for (let i = 0; i < 10; i ++)        
             add += parseInt(cpf.charAt(i)) * (11 - i);  
@@ -114,7 +111,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (response.ok) {
                 return response.json();
             } else {
-                // This will handle any non-JSON responses, including HTML error pages
                 return response.text().then(text => { throw new Error(text) });
             }
         })
@@ -122,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function () {
             alert(data.mensagem);
         })
         .catch(error => {
-            // This will catch errors from the above .then() or any network errors
             alert("Erro ao cadastrar o usuário: " + error.message);
         });
     });

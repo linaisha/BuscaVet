@@ -16,7 +16,6 @@ function validarEmail($email){
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-
 // como se valida um cnpj? link: https://blog.dbins.com.br/como-funciona-a-logica-da-validacao-do-cnpj#google_vignette
 function validarCnpj($cnpj){
     $cnpj = preg_replace('/\D/', '', $cnpj);
@@ -53,46 +52,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $login = $_POST['login'];
         $email = $_POST['email'];
         $cnpj = $_POST['cnpj'];
+        $endereco = $_POST['endereco'];
+        $crmv = $_POST['crmv'];
         $password = $_POST['password'];
 
         if (!validarEmail($email)) {
-            ob_end_clean();
             echo json_encode(["mensagem" => "E-mail inválido."]);
             exit;
         }
 
         if (!validarCnpj($cnpj)) {
-            ob_end_clean();
             echo json_encode(["mensagem" => "CNPJ inválido."]);
             exit;
         }
 
         if (!validarSenha($password)) {
-            ob_end_clean();
-            echo json_encode(["mensagem" => "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúsculo, uma letra minúscula, um número e um caractere especial."]);
+            echo json_encode(["mensagem" => "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial."]);
             exit;
         }
 
+        $crmv = strtoupper($_POST['crmv']);
+
         $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = mysqli_prepare($con, "INSERT INTO clinica (name, login, email, cnpj, data_nasc, password) VALUES (?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, 'ssssss', $name, $login, $email, $cnpj, $data_nasc, $passwordHashed);
+        $stmt = mysqli_prepare($con, "INSERT INTO clinica (name, login, email, cnpj, endereco, crmv, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, 'sssssss', $name, $login, $email, $cnpj, $endereco, $crmv, $passwordHashed);
 
         if (mysqli_stmt_execute($stmt)) {
-            ob_end_clean();
             echo json_encode(["mensagem" => "Clínica cadastrada com sucesso!"]);
         } else {
-            ob_end_clean();
             echo json_encode(["mensagem" => "Erro ao cadastrar a clínica: " . mysqli_stmt_error($stmt)]);
         }
 
         mysqli_stmt_close($stmt);
         mysqli_close($con);
     } else {
-        ob_end_clean();
         echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . mysqli_connect_error()]);
     }
 } else {
-    ob_end_clean();
     echo json_encode(["mensagem" => "Método de requisição inválido."]);
 }
 

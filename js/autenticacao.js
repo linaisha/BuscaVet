@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
     const /*banco_de_dados*/ = document.querySelector("#rec-senha form");
-
     /*banco_de_dados*/.addEventListener("submit", function (event) {
         event.preventDefault();
 

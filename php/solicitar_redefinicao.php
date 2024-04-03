@@ -37,7 +37,7 @@ function enviarEmailRedefinicao($email, $token) {
     $mail->addAddress($email);
     $mail->isHTML(true);
     $mail->Subject = 'Redefinição de Senha';
-    $urlRedefinicao = "http://localhost/php/redefinicao.php?token=$token";
+    $urlRedefinicao = "http://localhost/php/redefinicao_usuario.php?token=$token";
     $mail->Body = "Clique no seguinte link para redefinir sua senha: <a href='$urlRedefinicao'>Redefinir Senha</a>";
 
     try {

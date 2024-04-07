@@ -73,11 +73,11 @@ body {
   .form-cadastro-clinica,
   .form-login,
   .form-nova-senha,
-  .form-token{ animation: fadeIn 3s; }
+  .form-token{ animation: fadeIn 2s; }
     @keyframes fadeIn {
     0% {opacity: 0;}
-    50% {opacity: 3;}
-    100% {opacity: 5;}}
+    50% {opacity: 1;}
+    100% {opacity: 2;}}
 
 
   .form-rec-senha,
@@ -101,11 +101,11 @@ body {
     margin-bottom: 7px;
     text-align: center;
   }
- #titulo_geral { animation: fadeIn 5s; }
+ #titulo_geral { animation: fadeIn 2s; }
   @keyframes fadeIn {
   0% {opacity: 0;}
-  50% {opacity: 0;}
-  100% {opacity: 5;}}
+  50% {opacity: 1;}
+  100% {opacity: 2;}}
   #titulo_geral {
     color: #f9d72f;
     font-family: Bradley Hand, cursive;

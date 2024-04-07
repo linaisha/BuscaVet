@@ -19,10 +19,9 @@ $token = $_GET['token'] ?? '';
         </a>
 
         <ul>
-            <li><a href="index.html" class="link">HOME</a></li>
+            <li><a href="index.html" class="link">PÁGINA INICIAL</a></li>
             <li><a href="login.html" class="link">LOGIN</a></li>
-            <li><a href="cadastro_usuario.html" class="link">CADASTRE-SE</a></li>
-            <li><a href="autenticacao.html" class="link">AUTENTICACAO</a></li>
+            <li><a href="escolha_cadastro.html" class="link">CADASTRE-SE</a></li>
         </ul>
 </header>
     <h1 id="titulo_geral">Redefinição de Senha</h1>

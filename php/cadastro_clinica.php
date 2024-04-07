@@ -5,6 +5,13 @@ ob_start();
 error_reporting(0);
 ini_set('display_errors', 0);
 
+require '../PHPMailer/src/Exception.php';
+require '../PHPMailer/src/PHPMailer.php';
+require '../PHPMailer/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 header('Content-Type: application/json');
 
 function validarSenha($senha){
@@ -44,6 +51,36 @@ function validarCnpj($cnpj){
     }
 }
 
+function enviarEmailConfirmacao($email, $token) {
+    $mail = new PHPMailer(true);
+    try {
+        // Configuração do servidor SMTP
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'buscavetpucpr@gmail.com'; // Substitua pelo seu e-mail
+        $mail->Password = 'emdy mihd aoeo pxut';           // Substitua pela sua senha
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Definir remetente e destinatário
+        $mail->setFrom('buscavetpucpr@gmail.com', 'BuscaVet');
+        $mail->addAddress($email);
+
+        // Conteúdo do e-mail
+        $mail->isHTML(true);
+        $mail->Subject = 'Confirmação de Cadastro';
+        $mail->Body    = "Clique aqui para confirmar seu cadastro: <a href='http://localhost/php/confirmar_clinica.php?token={$token}'>Confirmar Cadastro</a>";
+
+        // Enviar o e-mail
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Erro ao enviar e-mail: {$mail->ErrorInfo}");
+        return false;
+    }
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $con = mysqli_connect("localhost", "root", "", "buscavet");
 
@@ -75,23 +112,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
         $stmt = mysqli_prepare($con, "INSERT INTO clinica (name, login, email, cnpj, endereco, crmv, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, 'sssssss', $name, $login, $email, $cnpj, $endereco, $crmv, $passwordHashed);
+        mysqli_stmt_bind_param($stmt, 'sssssss',
+         $name, 
+         $login, 
+         $email, 
+         $cnpj, 
+         $endereco, 
+         $crmv, 
+         $passwordHashed);
 
-        if (mysqli_stmt_execute($stmt)) {
-            echo json_encode(["mensagem" => "Clínica cadastrada com sucesso!"]);
+         if (mysqli_stmt_execute($stmt)) {
+            $token = bin2hex(random_bytes(50)); // Gera um token seguro
+            // Salva o token na base de dados
+            $updateTokenStmt = mysqli_prepare($con, "UPDATE clinica SET token = ? WHERE email = ?");
+            mysqli_stmt_bind_param($updateTokenStmt, 'ss', $token, $email);
+            mysqli_stmt_execute($updateTokenStmt);
+            mysqli_stmt_close($updateTokenStmt);
+
+            // Enviar e-mail de confirmação
+            if (enviarEmailConfirmacao($email, $token)) {
+                ob_end_clean();
+                echo json_encode(["mensagem" => "Clinica cadastrado com sucesso! E-mail de confirmação enviado."]);
+            } else {
+                ob_end_clean();
+                echo json_encode(["mensagem" => "Clinica cadastrado. Erro ao enviar e-mail de confirmação."]);
+            }
         } else {
-            echo json_encode(["mensagem" => "Erro ao cadastrar a clínica: " . mysqli_stmt_error($stmt)]);
+            ob_end_clean();
+            echo json_encode(["mensagem" => "Erro ao cadastrar o Clinica: " . mysqli_stmt_error($stmt)]);
         }
 
         mysqli_stmt_close($stmt);
         mysqli_close($con);
     } else {
+        ob_end_clean();
         echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . mysqli_connect_error()]);
     }
 } else {
+    ob_end_clean();
     echo json_encode(["mensagem" => "Método de requisição inválido."]);
 }
 
 ob_end_flush();
 
 ?>
+

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const /*banco_de_dados*/ = document.querySelector("#rec-senha form");
-    /*banco_de_dados*/.addEventListener("submit", function (event) {
+    const buscavet = document.querySelector("#rec-senha form");
+    buscavet.addEventListener("submit", function (event) {
         event.preventDefault();
 
         const email = document.getElementById("email").value;
@@ -10,14 +10,14 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const /*banco_de_dados*/ = new /*banco_de_dados*/();
-        /*banco_de_dados*/.append("email", email);
+        const buscavet = new buscavet();
+        buscavet.append("email", email);
         
         
 
         fetch("../php/autenticacao.php", {
             method: "POST",
-            body: /*banco_de_dados*/
+            body: buscavet
         })
         .then(response => response.text())
         .then(data => {

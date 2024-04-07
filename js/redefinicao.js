@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const /*banco_de_dados*/ = document.querySelector("#redefinicao form");
+    const buscavet = document.querySelector("#redefinicao form");
 
-    /*banco_de_dados*/.addEventListener("submit", function (event) {
+    buscavet.addEventListener("submit", function (event) {
         event.preventDefault();
 
         const new_password = document.getElementById("new_password").value;
@@ -14,14 +14,14 @@ document.addEventListener("DOMContentLoaded", function () {
         /*FAZER UMA COMPARACAO PARA VER SE ELES SAO IGUAIS*/
         }
 
-        const /*banco_de_dados*/ = new /*banco_de_dados*/();
-        /*banco_de_dados*/.append("new_password", new_password);
-        /*banco_de_dados*/.append("check_password", check_password);
+        const buscavet = new buscavet();
+        buscavet.append("new_password", new_password);
+        buscavet.append("check_password", check_password);
 
 
         fetch("../php/redefinicao.php", {
             method: "POST",
-            body: /*banco_de_dados*/
+            body: buscavet
         })
         .then(response => response.text())
         .then(data => {

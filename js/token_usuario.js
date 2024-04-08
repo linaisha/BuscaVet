@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData();
         formData.append("codigo_verificacao", code);
 
-        fetch("../php/verificar_codigo.php", {
+        fetch("../php/verificar_codigo_usuario.php", {
             method: "POST",
             body: formData
         })

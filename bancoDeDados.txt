@@ -11,7 +11,10 @@ CREATE TABLE IF NOT EXISTS usuario (
   data_nasc DATE NOT NULL,
   confirmacao TINYINT(1) NOT NULL,
   token VARCHAR(255),
-  token_expira DATETIME
+  token_expira DATETIME,
+  codigo_verificacao VARCHAR(6),
+  codigo_verificacao_expira DATETIME.
+  phone VARCHAR(20)
 );
 
 CREATE TABLE IF NOT EXISTS clinica (
@@ -25,5 +28,8 @@ CREATE TABLE IF NOT EXISTS clinica (
   password VARCHAR(50) NOT NULL,
   confirmacao TINYINT(1) NOT NULL,
   token_expira DATETIME,
-  token VARCHAR(255)
+  token VARCHAR(255),
+  codigo_verificacao VARCHAR(6),
+  codigo_verificacao_expira DATETIME,
+  phone VARCHAR(20)
 );

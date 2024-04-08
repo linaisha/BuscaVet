@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!new_password || !check_password) {
             alert("Por favor, preencha todos os campos.");
             return;
-        /*FAZER UMA COMPARACAO PARA VER SE ELES SAO IGUAIS*/
         }
 
         const buscavet = new buscavet();

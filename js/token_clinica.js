@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             if (data.success) {
                 alert(data.message);
-                window.location.href = "../php/pagina_segura.php"; // Redireciona para a página segura após verificação
+                window.location.href = "../php/pagina_segura.php";
             } else {
                 alert(data.message);
             }

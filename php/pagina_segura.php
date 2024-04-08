@@ -1,14 +1,11 @@
 <?php
 session_start();
 
-// Verifica se o usuário está logado
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_name'])) {
-    // Se não estiver logado, redireciona para a página de login
     header('Location: login.html');
     exit;
 }
 
-// Se chegou aqui, o usuário está logado
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +13,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_name'])) {
 <head>
     <meta charset="UTF-8">
     <title>Página Segura</title>
-    <link rel="stylesheet" href="../css/style.css"> <!-- Ajuste o caminho conforme necessário -->
+    <link rel="stylesheet" href="../css/style.css"> 
 </head>
 <body>
     <header class="cabecalho">
@@ -24,7 +21,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_name'])) {
     </header>
     <main>
         <p>Olá, <?php echo htmlspecialchars($_SESSION['user_name']); ?>. Seu login foi bem-sucedido!</p>
-        <p><a href="logout.php">Sair</a></p> <!-- Link para logout (precisa ser implementado) -->
+        <p><a href="logout.php">Sair</a></p>
     </main>
 </body>
 </html>

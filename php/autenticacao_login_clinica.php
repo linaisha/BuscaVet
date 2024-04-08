@@ -22,7 +22,7 @@ if (empty($email) || empty($password)) {
     exit;
 }
 
-$query = "SELECT id, name, email, password, confirmacao, phone FROM usuario WHERE email = ?";
+$query = "SELECT id, name, email, password, confirmacao, phone FROM clinica WHERE email = ?";
 $stmt = $conn->prepare($query);
 
 if (!$stmt) {
@@ -48,7 +48,7 @@ if ($result->num_rows > 0) {
         $codigo_verificacao = rand(100000, 999999);
         $codigo_verificacao_expira = new DateTime('+10 minutes');
 
-        $updateStmt = $conn->prepare("UPDATE usuario SET codigo_verificacao = ?, codigo_verificacao_expira = ? WHERE id = ?");
+        $updateStmt = $conn->prepare("UPDATE clinica SET codigo_verificacao = ?, codigo_verificacao_expira = ? WHERE id = ?");
         $updateStmt->bind_param('ssi', $codigo_verificacao, $codigo_verificacao_expira->format('Y-m-d H:i:s'), $user['id']);
         $updateStmt->execute();
         $updateStmt->close();

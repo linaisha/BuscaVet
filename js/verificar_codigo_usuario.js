@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData();
         formData.append("verification_code", code);
 
-        fetch("../php/verificar_codigo.php", {
+        fetch("../php/verificar_codigo_usuario.php", {
             method: "POST",
             body: formData
         })
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             if (data.success) {
                 alert(data.message);
-                window.location.href = "pagina_segura.php"; // Redireciona para a página segura após verificação
+                window.location.href = "pagina_segura_usuario.php";
             } else {
                 alert(data.message);
             }

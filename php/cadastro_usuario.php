@@ -5,7 +5,6 @@ ob_start();
 error_reporting(0);
 ini_set('display_errors', 0);
 
-// Inclui os arquivos do PHPMailer
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';
 require '../PHPMailer/src/SMTP.php';
@@ -37,25 +36,21 @@ function validarDataNasc($data_nasc){
 function enviarEmailConfirmacao($email, $token) {
     $mail = new PHPMailer(true);
     try {
-        // Configuração do servidor SMTP
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'buscavetpucpr@gmail.com'; // Substitua pelo seu e-mail
-        $mail->Password = 'emdy mihd aoeo pxut';           // Substitua pela sua senha
+        $mail->Username = 'buscavetpucpr@gmail.com';
+        $mail->Password = 'emdy mihd aoeo pxut';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        // Definir remetente e destinatário
         $mail->setFrom('buscavetpucpr@gmail.com', 'BuscaVet');
         $mail->addAddress($email);
 
-        // Conteúdo do e-mail
         $mail->isHTML(true);
         $mail->Subject = 'Confirmação de Cadastro';
         $mail->Body    = "Clique aqui para confirmar seu cadastro: <a href='http://localhost/php/confirmar_usuario.php?token={$token}'>Confirmar Cadastro</a>";
 
-        // Enviar o e-mail
         $mail->send();
         return true;
     } catch (Exception $e) {
@@ -113,14 +108,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $passwordHashed);
 
             if (mysqli_stmt_execute($stmt)) {
-                $token = bin2hex(random_bytes(50)); // Gera um token seguro
-                // Salva o token na base de dados
+                $token = bin2hex(random_bytes(50));
                 $updateTokenStmt = mysqli_prepare($con, "UPDATE usuario SET token = ? WHERE email = ?");
                 mysqli_stmt_bind_param($updateTokenStmt, 'ss', $token, $email);
                 mysqli_stmt_execute($updateTokenStmt);
                 mysqli_stmt_close($updateTokenStmt);
     
-                // Enviar e-mail de confirmação
                 if (enviarEmailConfirmacao($email, $token)) {
                     ob_end_clean();
                     echo json_encode(["mensagem" => "Usuário cadastrado com sucesso! E-mail de confirmação enviado."]);

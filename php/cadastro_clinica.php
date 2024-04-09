@@ -1,49 +1,52 @@
 <?php
-
 ob_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-error_reporting(0);
-ini_set('display_errors', 0);
-
-require '../PHPMailer/src/Exception.php';
-require '../PHPMailer/src/PHPMailer.php';
-require '../PHPMailer/src/SMTP.php';
+require_once '../PHPMailer/src/Exception.php';
+require_once '../PHPMailer/src/PHPMailer.php';
+require_once '../PHPMailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
-function validarSenha($senha){
+function validarSenha($senha)
+{
     $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
     return preg_match($regex, $senha);
 }
 
-function validarEmail($email){
+function validarEmail($email)
+{
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
 // como se valida um cnpj? link: https://blog.dbins.com.br/como-funciona-a-logica-da-validacao-do-cnpj#google_vignette
-function validarCnpj($cnpj){
+function validarCnpj($cnpj)
+{
     $cnpj = preg_replace('/\D/', '', $cnpj);
-    if (strlen($cnpj) !== 14) return false;
+    if (strlen($cnpj) !== 14)
+        return false;
 
     $calculo = 0;
     $calculo2 = 0;
-    $regra = [6,5,4,3,2,9,8,7,6,5,4,3,2];
-    
+    $regra = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
     for ($i = 0; $i < 12; $i++) {
-        $calculo = $calculo + ($cnpj[$i] * $regra[$i+1]);
+        $calculo = $calculo + ($cnpj[$i] * $regra[$i + 1]);
     }
-    
+
     $calculo = ($calculo % 11 < 2) ? 0 : 11 - ($calculo % 11);
-    
+
     for ($i = 0; $i < 13; $i++) {
         $calculo2 = $calculo2 + ($cnpj[$i] * $regra[$i]);
     }
-    
+
     $calculo2 = ($calculo2 % 11 < 2) ? 0 : 11 - ($calculo2 % 11);
-    
+
     if ($calculo != $cnpj[12] || $calculo2 != $cnpj[13]) {
         return false;
     } else {
@@ -51,9 +54,42 @@ function validarCnpj($cnpj){
     }
 }
 
-function enviarEmailConfirmacao($email, $token) {
-    $mail = new PHPMailer(true);
-    try {
+$conn = new mysqli('localhost', 'root', '', 'buscavet');
+
+if ($conn->connect_error) {
+    die(json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]));
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $conn->real_escape_string($_POST['name']);
+    $login = $conn->real_escape_string($_POST['login']);
+    $email = $conn->real_escape_string($_POST['email']);
+    $cnpj = $conn->real_escape_string($_POST['cnpj']);
+    $endereco = $conn->real_escape_string($_POST['endereco']);
+    $crmv = $conn->real_escape_string($_POST['crmv']);
+    $password = $_POST['password'];
+    $phone = $conn->real_escape_string($_POST['phone']);
+
+    if (!validarEmail($email) || !validarSenha($password) || !validarCnpj($cnpj)) {
+        echo json_encode(['success' => false, 'message' => 'Validação falhou']);
+        exit;
+    }
+
+    $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
+
+    $stmt = $conn->prepare("INSERT INTO clinica (name, login, email, cnpj, endereco, crmv, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssss", $name, $login, $email, $cnpj, $endereco, $crmv, $passwordHashed, $phone);
+
+    if ($stmt->execute()) {
+        $token = bin2hex(random_bytes(16));
+        $expira = date("Y-m-d H:i:s", strtotime('+1 day'));
+
+        $stmtUpdate = $conn->prepare("UPDATE clinica SET token = ?, token_expira = ? WHERE email = ?");
+        $stmtUpdate->bind_param("sss", $token, $expira, $email);
+        $stmtUpdate->execute();
+        $stmtUpdate->close();
+
+        $mail = new PHPMailer(true);
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
@@ -63,90 +99,28 @@ function enviarEmailConfirmacao($email, $token) {
         $mail->Port = 587;
 
         $mail->setFrom('buscavetpucpr@gmail.com', 'BuscaVet');
-        $mail->addAddress($email)
+        $mail->addAddress($email);
+
         $mail->isHTML(true);
         $mail->Subject = 'Confirmação de Cadastro';
-        $mail->Body    = "Clique aqui para confirmar seu cadastro: <a href='http://localhost/php/confirmar_clinica.php?token={$token}'>Confirmar Cadastro</a>";
+        $mail->Body = "Clique aqui para confirmar seu cadastro: <a href='http://localhost/php/confirmar_clinica.php?token={$token}'>Confirmar Cadastro</a>";
 
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        error_log("Erro ao enviar e-mail: {$mail->ErrorInfo}");
-        return false;
-    }
-}
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $con = mysqli_connect("localhost", "root", "", "buscavet");
-
-    if ($con) {
-        $name = $_POST['name'];
-        $login = $_POST['login'];
-        $email = $_POST['email'];
-        $cnpj = $_POST['cnpj'];
-        $endereco = $_POST['endereco'];
-        $crmv = $_POST['crmv'];
-        $password = $_POST['password'];
-
-        if (!validarEmail($email)) {
-            echo json_encode(["mensagem" => "E-mail inválido."]);
-            exit;
-        }
-
-        if (!validarCnpj($cnpj)) {
-            echo json_encode(["mensagem" => "CNPJ inválido."]);
-            exit;
-        }
-
-        if (!validarSenha($password)) {
-            echo json_encode(["mensagem" => "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial."]);
-            exit;
-        }
-
-        $crmv = strtoupper($_POST['crmv']);
-
-        $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = mysqli_prepare($con, "INSERT INTO clinica (name, login, email, cnpj, endereco, crmv, password) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param($stmt, 'sssssss',
-         $name, 
-         $login, 
-         $email, 
-         $cnpj, 
-         $endereco, 
-         $crmv, 
-         $passwordHashed);
-
-         if (mysqli_stmt_execute($stmt)) {
-            $token = bin2hex(random_bytes(50));
-            $updateTokenStmt = mysqli_prepare($con, "UPDATE clinica SET token = ? WHERE email = ?");
-            mysqli_stmt_bind_param($updateTokenStmt, 'ss', $token, $email);
-            mysqli_stmt_execute($updateTokenStmt);
-            mysqli_stmt_close($updateTokenStmt);
-
-            if (enviarEmailConfirmacao($email, $token)) {
-                ob_end_clean();
-                echo json_encode(["mensagem" => "Clinica cadastrado com sucesso! E-mail de confirmação enviado."]);
-            } else {
-                ob_end_clean();
-                echo json_encode(["mensagem" => "Clinica cadastrado. Erro ao enviar e-mail de confirmação."]);
-            }
+        if ($mail->send()) {
+            echo json_encode(['success' => true, 'message' => 'Clínica cadastrada e e-mail de confirmação enviado.']);
         } else {
-            ob_end_clean();
-            echo json_encode(["mensagem" => "Erro ao cadastrar o Clinica: " . mysqli_stmt_error($stmt)]);
+            echo json_encode(['success' => false, 'message' => 'Clínica cadastrada, mas houve um erro ao enviar o e-mail de confirmação.']);
         }
-
-        mysqli_stmt_close($stmt);
-        mysqli_close($con);
     } else {
-        ob_end_clean();
-        echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . mysqli_connect_error()]);
+        echo json_encode(['success' => false, 'message' => 'Erro ao cadastrar a clínica: ' . $stmt->error]);
     }
+
+    $stmt->close();
 } else {
-    ob_end_clean();
-    echo json_encode(["mensagem" => "Método de requisição inválido."]);
+    echo json_encode(['success' => false, 'message' => 'Método de requisição inválido']);
 }
 
+$conn->close();
 ob_end_flush();
 
 ?>
-

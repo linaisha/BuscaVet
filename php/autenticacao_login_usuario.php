@@ -1,4 +1,8 @@
 <?php
+ob_start();
+ini_set('display_errors', 0);
+error_reporting(0);
+
 session_start();
 header('Content-Type: application/json');
 
@@ -45,11 +49,13 @@ if ($result->num_rows > 0) {
     }
 
     if (password_verify($password, $user['password'])) {
-        $codigo_verificacao = rand(100000, 999999);
-        $codigo_verificacao_expira = new DateTime('+10 minutes');
+        $_SESSION['login_user_id'] = $user['id'];
+        $_SESSION['login_user_email'] = $user['email'];
 
+        $codigo_verificacao = rand(100000, 999999);
+        $codigo_verificacao_expira = (new DateTime())->add(new DateInterval('PT10M'))->format('Y-m-d H:i:s');
         $updateStmt = $conn->prepare("UPDATE usuario SET codigo_verificacao = ?, codigo_verificacao_expira = ? WHERE id = ?");
-        $updateStmt->bind_param('ssi', $codigo_verificacao, $codigo_verificacao_expira->format('Y-m-d H:i:s'), $user['id']);
+        $updateStmt->bind_param('ssi', $codigo_verificacao, $codigo_verificacao_expira, $user['id']);
         $updateStmt->execute();
         $updateStmt->close();
 
@@ -59,7 +65,7 @@ if ($result->num_rows > 0) {
         $twilioPhoneNumber = '13203968435';
 
         $client = new Twilio\Rest\Client($twilioSid, $twilioToken);
-        
+
         try {
             $message = $client->messages->create(
                 $user['phone'],
@@ -68,10 +74,8 @@ if ($result->num_rows > 0) {
                     'body' => "Seu código de verificação é: {$codigo_verificacao}"
                 ]
             );
-            
-            $_SESSION['login_user_id'] = $user['id'];
-            $_SESSION['login_user_email'] = $user['email'];
-            echo json_encode(['success' => true, 'message' => 'Código de verificação enviado.', 'next_step' => 'verify_code']);
+
+            echo json_encode(['success' => true, 'message' => 'Login bem-sucedido e SMS enviado.']);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro ao enviar código de verificação: ' . $e->getMessage()]);
         }
@@ -84,4 +88,5 @@ if ($result->num_rows > 0) {
 
 $stmt->close();
 $conn->close();
+ob_end_flush();
 ?>

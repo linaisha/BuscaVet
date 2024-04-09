@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 header('Content-Type: application/json');
@@ -14,12 +13,12 @@ if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]));
 }
 
-if (empty($_POST['codigo_verificacao'])) {
+if (empty($_POST['verification_code'])) {
     echo json_encode(['success' => false, 'message' => 'Código de verificação é necessário.']);
     exit;
 }
 
-$verificationCode = $_POST['codigo_verificacao'];
+$verificationCode = $_POST['verification_code'];
 $userId = $_SESSION['login_user_id'] ?? '';
 
 $stmt = $conn->prepare("SELECT * FROM usuario WHERE id = ? AND codigo_verificacao = ? AND codigo_verificacao_expira > NOW()");

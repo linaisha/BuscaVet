@@ -12,7 +12,8 @@ if (!$con) {
     die("Conexão falhou: " . mysqli_connect_error());
 }
 
-function emailExiste($con, $email) {
+function emailExiste($con, $email)
+{
     $stmt = $con->prepare("SELECT id FROM clinica WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -20,11 +21,13 @@ function emailExiste($con, $email) {
     return $result->num_rows > 0;
 }
 
-function validarEmail($email) {
+function validarEmail($email)
+{
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-function enviarEmailRedefinicao($email, $token) {
+function enviarEmailRedefinicao($email, $token)
+{
     $mail = new PHPMailer(true);
     $mail->isSMTP();
     $mail->Host = 'smtp.gmail.com';

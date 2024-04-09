@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const formData = new FormData(formLogin);
 
-    fetch("../php/autenticacao_login_usuario.php", {
+    fetch("../php/autenticacao_login_clinica.php", {
       method: "POST",
       body: formData,
     })
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .then((data) => {
         if (data.success) {
-          window.location.href = "verificar_codigo_usuario.html";
+          window.location.href = "verificar_codigo_clinica.html";
         } else {
           throw new Error(data.message);
         }

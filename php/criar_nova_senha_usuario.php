@@ -12,7 +12,8 @@ if (!$con) {
     die("Falha na conexão: " . mysqli_connect_error());
 }
 
-function validarSenha($senha) {
+function validarSenha($senha)
+{
     $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
     return preg_match($regex, $senha);
 }

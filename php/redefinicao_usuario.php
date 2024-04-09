@@ -1,32 +1,32 @@
-<!-- redefinicao.php -->
 <?php
 $token = $_GET['token'] ?? '';
 ?>
 <html>
+
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../css/style.css">
     <title> BuscaVet - Redefinição de Senha </title>
     <link rel="icon" href="/img/Logo.png">
 </head>
+
 <body style="background-image: url('../img/BuscaVetLogo.png');">
 
-<header class="cabecalho">
-    <div class="juntos">
-    <div class="logo">
-        <a href="/img/imagem.png">
-            <img src="../img/Logo.png" width="120" height="120">
-        </a>
+    <header class="cabecalho">
+        <div class="juntos">
+            <div class="logo">
+                <a href="/img/imagem.png">
+                    <img src="../img/Logo.png" width="120" height="120">
+                </a>
 
-        <ul>
-            <li><a href="index.html" class="link">PÁGINA INICIAL</a></li>
-            <li><a href="login.html" class="link">LOGIN</a></li>
-            <li><a href="escolha_cadastro.html" class="link">CADASTRE-SE</a></li>
-        </ul>
-</header>
+                <ul>
+                    <li><a href="../html/index.html" class="link">PÁGINA INICIAL</a></li>
+                    <li><a href="../html/escolha_cadastro.html" class="link">CADASTRE-SE</a></li>
+                </ul>
+    </header>
     <h1 id="titulo_geral">Redefinição de Senha</h1>
     <div id="nova-senha" class="nova-senha">
-        <form id="form-nova-senha" action="criar_nova_senha.php" method="post" class="form-nova-senha">
+        <form id="form-nova-senha" action="criar_nova_senha_usuario.php" method="post" class="form-nova-senha">
             <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
             <div class="input-container">
                 <label for="new_password">Nova Senha:</label>
@@ -40,4 +40,5 @@ $token = $_GET['token'] ?? '';
         </form>
     </div>
 </body>
+
 </html>

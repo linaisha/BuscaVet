@@ -3,8 +3,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="../js/administrador.js"></script>
-    <title> BuscaVet - Recuperação de Senha </title>
+    <title> BuscaVet - Recuperação de Senha Usuario </title>
     <link rel="icon" href="/img/Logo.png">
 </head>
 
@@ -18,14 +17,13 @@
 
             <ul>
                 <li><a href="index.html" class="link">PÁGINA INICIAL</a></li>
-                <li><a href="login.html" class="link">LOGIN</a></li>
                 <li><a href="escolha_cadastro.html" class="link">CADASTRE-SE</a></li>
             </ul>
 
     </header>
         <h1 id="titulo_geral">Recuperação de senha</h1>
         <div id="rec-senha" class="rec-senha">
-            <form id="form-rec-senha" action="../php/solicitar_redefinicao.php" method="post" class="form-rec-senha">
+            <form id="form-rec-senha" action="../php/solicitar_redefinicao_usuario.php" method="post" class="form-rec-senha">
                 <div class="input-container">
                     <label for="email">Digite seu e-mail</label>
                     <input type="text" name="email" id="email" required>

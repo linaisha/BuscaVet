@@ -2,6 +2,7 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/login_usuario.js"></script>
   <title> BuscaVet - Login </title>
   <link rel="icon" href="/img/Logo.png">
 </head>
@@ -15,13 +16,12 @@
 
             <ul>
                 <li><a href="index.html" class="link">PÁGINA INICIAL</a></li>
-                <li><a href="login.html" class="link">LOGIN</a></li>
                 <li><a href="escolha_cadastro.html" class="link">CADASTRE-SE</a></li>
             </ul>
       </header>
-    <h1 id="titulo_geral">Login</h1>
+    <h1 id="titulo_geral">Login Usuário</h1>
     <div id="login" class="login">
-        <form id="form-login" action="../php/autenticacao_login.php" method="post" class="form-login">
+        <form id="form-login" action="../php/autenticacao_login_usuario.php" method="post" class="form-login">
             <div class="input-container">
                 <label for="email">E-mail<label>
                 <input type="text" name="email" id="email" required>

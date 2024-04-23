@@ -1,4 +1,5 @@
 <?php
+include 'config.php';
 
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';
@@ -7,8 +8,8 @@ require '../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$con = mysqli_connect("localhost", "root", "", "buscavet");
-if (!$con) {
+$conn = new mysqli(servername, username, password, database);
+if (!$conn) {
     die("Falha na conexão: " . mysqli_connect_error());
 }
 
@@ -33,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $stmt = $con->prepare("SELECT * FROM usuario WHERE token = ? AND token_expira > NOW()");
+    $stmt = $conn->prepare("SELECT * FROM usuario WHERE token = ? AND token_expira > NOW()");
     $stmt->bind_param("s", $token);
     $stmt->execute();
     $resultado = $stmt->get_result();
@@ -42,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $usuario = $resultado->fetch_assoc();
         $passwordHashed = password_hash($new_password, PASSWORD_DEFAULT);
 
-        $updateStmt = $con->prepare("UPDATE usuario SET password = ?, token = '', token_expira = NULL WHERE id = ?");
+        $updateStmt = $conn->prepare("UPDATE usuario SET password = ?, token = '', token_expira = NULL WHERE id = ?");
         $updateStmt->bind_param("si", $passwordHashed, $usuario['id']);
         $updateStmt->execute();
 
@@ -59,6 +60,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 
-mysqli_close($con);
+mysqli_close($conn);
 
 ?>

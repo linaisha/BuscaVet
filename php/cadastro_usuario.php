@@ -1,4 +1,6 @@
 <?php
+include 'config.php';
+
 ob_start();
 
 error_reporting(0);
@@ -63,9 +65,10 @@ function enviarEmailConfirmacao($email, $token)
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $con = mysqli_connect("localhost", "root", "", "buscavet");
 
-    if ($con) {
+    $conn = new mysqli(servername, username, password, database);
+
+    if ($conn) {
         $name = $_POST['name'];
         $login = $_POST['login'];
         $email = $_POST['email'];
@@ -102,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = mysqli_prepare($con, "INSERT INTO usuario (name, login, email, data_nasc, cpf, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = mysqli_prepare($conn, "INSERT INTO usuario (name, login, email, data_nasc, cpf, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
         mysqli_stmt_bind_param(
             $stmt,
             'sssssss',
@@ -117,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (mysqli_stmt_execute($stmt)) {
             $token = bin2hex(random_bytes(50));
-            $updateTokenStmt = mysqli_prepare($con, "UPDATE usuario SET token = ? WHERE email = ?");
+            $updateTokenStmt = mysqli_prepare($conn, "UPDATE usuario SET token = ? WHERE email = ?");
             mysqli_stmt_bind_param($updateTokenStmt, 'ss', $token, $email);
             mysqli_stmt_execute($updateTokenStmt);
             mysqli_stmt_close($updateTokenStmt);
@@ -135,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         mysqli_stmt_close($stmt);
-        mysqli_close($con);
+        mysqli_close($conn);
     } else {
         ob_end_clean();
         echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . mysqli_connect_error()]);

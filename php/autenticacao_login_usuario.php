@@ -1,4 +1,6 @@
 <?php
+include 'config.php';
+
 ob_start();
 ini_set('display_errors', 0);
 error_reporting(0);
@@ -6,12 +8,7 @@ error_reporting(0);
 session_start();
 header('Content-Type: application/json');
 
-$host = "localhost";
-$username = "root";
-$password = "";
-$database = "buscavet";
-
-$conn = new mysqli($host, $username, $password, $database);
+$conn = new mysqli(servername, username, password, database);
 
 if ($conn->connect_error) {
     echo json_encode(['success' => false, 'message' => 'Falha na conexão: ' . $conn->connect_error]);

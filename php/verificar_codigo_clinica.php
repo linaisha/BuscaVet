@@ -1,13 +1,10 @@
 <?php
+include 'config.php';
+
 session_start();
 header('Content-Type: application/json');
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "buscavet";
-
-$conn = new mysqli($servername, $username, $password, $database);
+$conn = new mysqli(servername, username, password, database);
 
 if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]));

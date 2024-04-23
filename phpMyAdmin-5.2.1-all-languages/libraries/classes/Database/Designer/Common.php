@@ -128,8 +128,8 @@ class Common
     public function getScriptContr(array $designerTables): array
     {
         $this->dbi->selectDb($GLOBALS['db']);
-        $con = [];
-        $con['C_NAME'] = [];
+        $conn = [];
+        $conn['C_NAME'] = [];
         $i = 0;
         $alltab_rs = $this->dbi->query('SHOW TABLES FROM ' . Util::backquote($GLOBALS['db']));
         while ($val = $alltab_rs->fetchRow()) {
@@ -138,11 +138,11 @@ class Common
             $row = $this->relation->getForeigners($GLOBALS['db'], $val, '', 'internal');
 
             foreach ($row as $field => $value) {
-                $con['C_NAME'][$i] = '';
-                $con['DTN'][$i] = rawurlencode($GLOBALS['db'] . '.' . $val);
-                $con['DCN'][$i] = rawurlencode((string) $field);
-                $con['STN'][$i] = rawurlencode($value['foreign_db'] . '.' . $value['foreign_table']);
-                $con['SCN'][$i] = rawurlencode($value['foreign_field']);
+                $conn['C_NAME'][$i] = '';
+                $conn['DTN'][$i] = rawurlencode($GLOBALS['db'] . '.' . $val);
+                $conn['DCN'][$i] = rawurlencode((string) $field);
+                $conn['STN'][$i] = rawurlencode($value['foreign_db'] . '.' . $value['foreign_table']);
+                $conn['SCN'][$i] = rawurlencode($value['foreign_field']);
                 $i++;
             }
 
@@ -155,14 +155,14 @@ class Common
 
             foreach ($row['foreign_keys_data'] as $one_key) {
                 foreach ($one_key['index_list'] as $index => $one_field) {
-                    $con['C_NAME'][$i] = rawurlencode($one_key['constraint']);
-                    $con['DTN'][$i] = rawurlencode($GLOBALS['db'] . '.' . $val);
-                    $con['DCN'][$i] = rawurlencode($one_field);
-                    $con['STN'][$i] = rawurlencode(
+                    $conn['C_NAME'][$i] = rawurlencode($one_key['constraint']);
+                    $conn['DTN'][$i] = rawurlencode($GLOBALS['db'] . '.' . $val);
+                    $conn['DCN'][$i] = rawurlencode($one_field);
+                    $conn['STN'][$i] = rawurlencode(
                         ($one_key['ref_db_name'] ?? $GLOBALS['db'])
                         . '.' . $one_key['ref_table_name']
                     );
-                    $con['SCN'][$i] = rawurlencode($one_key['ref_index_list'][$index]);
+                    $conn['SCN'][$i] = rawurlencode($one_key['ref_index_list'][$index]);
                     $i++;
                 }
             }
@@ -175,16 +175,16 @@ class Common
 
         $ti = 0;
         $retval = [];
-        for ($i = 0, $cnt = count($con['C_NAME']); $i < $cnt; $i++) {
-            $c_name_i = $con['C_NAME'][$i];
-            $dtn_i = $con['DTN'][$i];
+        for ($i = 0, $cnt = count($conn['C_NAME']); $i < $cnt; $i++) {
+            $c_name_i = $conn['C_NAME'][$i];
+            $dtn_i = $conn['DTN'][$i];
             $retval[$ti] = [];
             $retval[$ti][$c_name_i] = [];
-            if (in_array($dtn_i, $tableDbNames) && in_array($con['STN'][$i], $tableDbNames)) {
+            if (in_array($dtn_i, $tableDbNames) && in_array($conn['STN'][$i], $tableDbNames)) {
                 $retval[$ti][$c_name_i][$dtn_i] = [];
-                $retval[$ti][$c_name_i][$dtn_i][$con['DCN'][$i]] = [
-                    0 => $con['STN'][$i],
-                    1 => $con['SCN'][$i],
+                $retval[$ti][$c_name_i][$dtn_i][$conn['DCN'][$i]] = [
+                    0 => $conn['STN'][$i],
+                    1 => $conn['SCN'][$i],
                 ];
             }
 

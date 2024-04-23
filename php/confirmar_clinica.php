@@ -1,6 +1,7 @@
 <?php
+include 'config.php';
 
-$con = mysqli_connect("localhost", "root", "", "buscavet");
+$conn = new mysqli(servername, username, password, database);
 
 if (mysqli_connect_errno()) {
     echo "Falha na conexão com o banco de dados: " . mysqli_connect_error();
@@ -10,7 +11,7 @@ if (mysqli_connect_errno()) {
 $token = $_GET['token'] ?? '';
 
 if ($token) {
-    $stmt = $con->prepare("UPDATE clinica SET confirmacao = 1 WHERE token = ?");
+    $stmt = $conn->prepare("UPDATE clinica SET confirmacao = 1 WHERE token = ?");
     $stmt->bind_param("s", $token);
     $stmt->execute();
 
@@ -25,6 +26,6 @@ if ($token) {
     echo "Token não fornecido.";
 }
 
-$con->close();
+$conn->close();
 
 ?>

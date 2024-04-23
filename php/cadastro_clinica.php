@@ -1,4 +1,6 @@
 <?php
+include 'config.php';
+
 ob_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -54,7 +56,7 @@ function validarCnpj($cnpj)
     }
 }
 
-$conn = new mysqli('localhost', 'root', '', 'buscavet');
+$conn = new mysqli(servername, username, password, database);
 
 if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]));

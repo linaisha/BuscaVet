@@ -1,4 +1,5 @@
 <?php
+include 'config.php';
 
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';
@@ -7,14 +8,14 @@ require '../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$con = mysqli_connect("localhost", "root", "", "buscavet");
-if (!$con) {
+$conn = new mysqli(servername, username, password, database);
+if (!$conn) {
     die("Conexão falhou: " . mysqli_connect_error());
 }
 
-function emailExiste($con, $email)
+function emailExiste($conn, $email)
 {
-    $stmt = $con->prepare("SELECT id FROM usuario WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id FROM usuario WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -54,11 +55,11 @@ function enviarEmailRedefinicao($email, $token)
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
-    if (validarEmail($email) && emailExiste($con, $email)) {
+    if (validarEmail($email) && emailExiste($conn, $email)) {
         $token = bin2hex(random_bytes(50));
         $expira = date("Y-m-d H:i:s", strtotime('+1 hour'));
 
-        $stmt = $con->prepare("UPDATE usuario SET token = ?, token_expira = ? WHERE email = ?");
+        $stmt = $conn->prepare("UPDATE usuario SET token = ?, token_expira = ? WHERE email = ?");
         $stmt->bind_param("sss", $token, $expira, $email);
         if ($stmt->execute()) {
             if (enviarEmailRedefinicao($email, $token)) {
@@ -75,5 +76,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-mysqli_close($con);
+mysqli_close($conn);
 ?>

@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS usuario (
   token VARCHAR(255),
   token_expira DATETIME,
   codigo_verificacao VARCHAR(6),
-  codigo_verificacao_expira DATETIME.
+  codigo_verificacao_expira DATETIME,
   phone VARCHAR(20)
 );
 

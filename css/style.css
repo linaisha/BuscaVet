@@ -73,7 +73,8 @@ body {
   .form-cadastro-clinica,
   .form-login,
   .form-nova-senha,
-  .form-token{ animation: fadeIn 2s; }
+  .form-token,
+  .form-especie{ animation: fadeIn 2s; }
     @keyframes fadeIn {
     0% {opacity: 0;}
     50% {opacity: 1;}
@@ -85,7 +86,8 @@ body {
   .form-cadastro-clinica,
   .form-login,
   .form-nova-senha,
-  .form-token{
+  .form-token,
+  .form-especie{
     background-color: #f9d72f;
     padding: 20px 30px;
     border-radius: 35% 10% 35% 10% / 20% 35% 20% 35%;
@@ -123,7 +125,8 @@ body {
   .cadastro-clinica,
   .login,
   .nova-senha,
-  .token {
+  .token,
+  .especie {
     display: flex;
     align-items: center;
     width: 100%;
@@ -160,7 +163,8 @@ body {
   form.form-cadastro-clinica,
   form.form-login,
   form.form-nova-senha,
-  form.form-token{
+  form.form-token,
+  form.form-especie{
     text-align: center;
   }
  
@@ -179,3 +183,17 @@ body {
   button:hover{
     filter: brightness(100%);
   }
+  select{
+    appearance: none;
+    border: 1px solid;
+    padding: 20px;
+    width: 400px;
+    height: 30px;
+    background: #f9d72f;
+    filter: brightness(85%);
+    border-radius: 20% 35% 20% 35% / 35% 10% 35% 10%;
+    font-family: Bradley Hand, cursive;
+    font-size: 20px;
+    text-align: center;
+  }
+  

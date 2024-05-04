@@ -15,20 +15,16 @@ use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
-function validarSenha($senha)
-{
+function validarSenha($senha) {
     $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
     return preg_match($regex, $senha);
 }
 
-function validarEmail($email)
-{
+function validarEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-// como se valida um cnpj? link: https://blog.dbins.com.br/como-funciona-a-logica-da-validacao-do-cnpj#google_vignette
-function validarCnpj($cnpj)
-{
+function validarCnpj($cnpj) {
     $cnpj = preg_replace('/\D/', '', $cnpj);
     if (strlen($cnpj) !== 14)
         return false;
@@ -77,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
+    $passwordHashed = hash('sha256', $password);
 
     $stmt = $conn->prepare("INSERT INTO clinica (name, login, email, cnpj, endereco, crmv, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssssss", $name, $login, $email, $cnpj, $endereco, $crmv, $passwordHashed, $phone);
@@ -91,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtUpdate->execute();
         $stmtUpdate->close();
 
+        // Código para enviar e-mail de confirmação segue...
         $mail = new PHPMailer(true);
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
@@ -106,7 +103,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->isHTML(true);
         $mail->Subject = 'Confirmação de Cadastro';
         $mail->Body = "Clique aqui para confirmar seu cadastro: <a href='http://localhost/php/confirmar_clinica.php?token={$token}'>Confirmar Cadastro</a>";
-
 
         if ($mail->send()) {
             echo json_encode(['success' => true, 'message' => 'Clínica cadastrada e e-mail de confirmação enviado.']);
@@ -124,5 +120,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $conn->close();
 ob_end_flush();
-
 ?>

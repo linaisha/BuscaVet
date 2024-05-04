@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($resultado->num_rows == 1) {
         $usuario = $resultado->fetch_assoc();
-        $passwordHashed = password_hash($new_password, PASSWORD_DEFAULT);
+        $passwordHashed = hash('sha256', $password);
 
         $updateStmt = $conn->prepare("UPDATE usuario SET password = ?, token = '', token_expira = NULL WHERE id = ?");
         $updateStmt->bind_param("si", $passwordHashed, $usuario['id']);

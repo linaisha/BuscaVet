@@ -2,7 +2,6 @@
 include 'config.php';
 
 ob_start();
-
 error_reporting(0);
 ini_set('display_errors', 0);
 
@@ -15,30 +14,26 @@ use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
-function validarSenha($senha)
-{
+function validarSenha($senha) {
     $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
     return preg_match($regex, $senha);
 }
 
-function validarEmail($email)
-{
+function validarEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-function validarCpfCnpj($cpfCnpj)
-{
+function validarCpfCnpj($cpfCnpj) {
     $cleaned = preg_replace('/\D/', '', $cpfCnpj);
     return strlen($cleaned) === 11 || strlen($cleaned) === 14;
 }
 
-function validarDataNasc($data_nasc)
-{
+function validarDataNasc($data_nasc) {
     $regexData = '/^\d{4}-\d{2}-\d{2}$/';
     return preg_match($regexData, $data_nasc);
 }
-function enviarEmailConfirmacao($email, $token)
-{
+
+function enviarEmailConfirmacao($email, $token) {
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
@@ -65,9 +60,7 @@ function enviarEmailConfirmacao($email, $token)
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     $conn = new mysqli(servername, username, password, database);
-
     if ($conn) {
         $name = $_POST['name'];
         $login = $_POST['login'];
@@ -89,9 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-
-        error_log("Validating date of birth: " . $data_nasc);
-
         if (!validarDataNasc($data_nasc)) {
             ob_end_clean();
             echo json_encode(["mensagem" => "Data de nascimento inválida."]);
@@ -100,23 +90,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (!validarSenha($password)) {
             ob_end_clean();
-            echo json_encode(["mensagem" => "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúsculo, uma letra minúscula, um número e um caractere especial."]);
+            echo json_encode(["mensagem" => "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial."]);
             exit;
         }
 
-        $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = mysqli_prepare($conn, "INSERT INTO usuario (name, login, email, data_nasc, cpf, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        mysqli_stmt_bind_param(
-            $stmt,
-            'sssssss',
-            $name,
-            $login,
-            $email,
-            $data_nasc,
-            $cpf,
-            $passwordHashed,
-            $phone
-        );
+        // SHA-256 Hashing
+        $passwordHashed = hash('sha256', $password);
+        $stmt = $conn->prepare("INSERT INTO usuario (name, login, email, data_nasc, cpf, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, 'sssssss', $name, $login, $email, $data_nasc, $cpf, $passwordHashed, $phone);
 
         if (mysqli_stmt_execute($stmt)) {
             $token = bin2hex(random_bytes(50));
@@ -149,5 +130,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ob_end_flush();
-
 ?>

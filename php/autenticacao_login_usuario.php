@@ -16,9 +16,9 @@ if ($conn->connect_error) {
 }
 
 $email = isset($_POST['email']) ? $conn->real_escape_string($_POST['email']) : '';
-$password = isset($_POST['password']) ? $_POST['password'] : '';
+$hashedPassword = isset($_POST['password']) ? $_POST['password'] : '';
 
-if (empty($email) || empty($password)) {
+if (empty($email) || empty($hashedPassword)) {
     echo json_encode(['success' => false, 'message' => 'Email e senha são obrigatórios.']);
     exit;
 }
@@ -45,7 +45,7 @@ if ($result->num_rows > 0) {
         exit;
     }
 
-    if (password_verify($password, $user['password'])) {
+    if ($user['password'] === $hashedPassword) {
         $_SESSION['login_user_id'] = $user['id'];
         $_SESSION['login_user_email'] = $user['email'];
 

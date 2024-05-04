@@ -16,9 +16,9 @@ if ($conn->connect_error) {
 }
 
 $email = isset($_POST['email']) ? $conn->real_escape_string($_POST['email']) : '';
-$password = isset($_POST['password']) ? $_POST['password'] : '';
+$hashedPassword = isset($_POST['password']) ? $_POST['password'] : '';
 
-if (empty($email) || empty($password)) {
+if (empty($email) || empty($hashedPassword)) {
     echo json_encode(['success' => false, 'message' => 'Email e senha são obrigatórios.']);
     exit;
 }
@@ -45,11 +45,11 @@ if ($result->num_rows > 0) {
         exit;
     }
 
-    if (password_verify($password, $user['password'])) {
+    // Agora compara os hashes SHA-256 diretamente
+    if ($user['password'] === $hashedPassword) {
         $_SESSION['login_user_id'] = $user['id'];
         $_SESSION['login_user_email'] = $user['email'];
 
-        // Aqui começa o novo trecho para o Twilio
         $codigo_verificacao = rand(100000, 999999);
         $codigo_verificacao_expira = (new DateTime())->add(new DateInterval('PT10M'))->format('Y-m-d H:i:s');
         $updateStmt = $conn->prepare("UPDATE clinica SET codigo_verificacao = ?, codigo_verificacao_expira = ? WHERE id = ?");

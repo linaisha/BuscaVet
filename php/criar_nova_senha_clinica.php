@@ -1,6 +1,10 @@
 <?php
 include 'config.php';
 
+ob_start();
+error_reporting(0);
+ini_set('display_errors', 0);
+
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';
 require '../PHPMailer/src/SMTP.php';
@@ -8,58 +12,122 @@ require '../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$conn = new mysqli(servername, username, password, database);
-if (!$conn) {
-    die("Falha na conexão: " . mysqli_connect_error());
-}
+header('Content-Type: application/json');
 
-function validarSenha($senha)
-{
+function validarSenha($senha) {
     $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
     return preg_match($regex, $senha);
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $token = $_POST['token'];
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    if ($new_password !== $confirm_password) {
-        echo json_encode(["mensagem" => "As senhas não coincidem."]);
-        exit;
-    }
-
-    if (!validarSenha($new_password)) {
-        echo json_encode(["mensagem" => "A senha não atende aos requisitos de segurança."]);
-        exit;
-    }
-
-    $stmt = $conn->prepare("SELECT * FROM clinica WHERE token = ? AND token_expira > NOW()");
-    $stmt->bind_param("s", $token);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-
-    if ($resultado->num_rows == 1) {
-        $clinica = $resultado->fetch_assoc();
-        $passwordHashed = password_hash($new_password, PASSWORD_DEFAULT);
-
-        $updateStmt = $conn->prepare("UPDATE clinica SET password = ?, token = '', token_expira = NULL WHERE id = ?");
-        $updateStmt->bind_param("si", $passwordHashed, $clinica['id']);
-        $updateStmt->execute();
-
-        if ($updateStmt->affected_rows == 1) {
-            echo json_encode(["mensagem" => "Senha atualizada com sucesso."]);
-        } else {
-            echo json_encode(["mensagem" => "Erro ao atualizar a senha."]);
-        }
-        $updateStmt->close();
-    } else {
-        echo json_encode(["mensagem" => "Token inválido ou expirado."]);
-    }
-
-    $stmt->close();
+function validarEmail($email) {
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-mysqli_close($conn);
+function validarCpfCnpj($cpfCnpj) {
+    $cleaned = preg_replace('/\D/', '', $cpfCnpj);
+    return strlen($cleaned) === 11 || strlen($cleaned) === 14;
+}
 
+function validarDataNasc($data_nasc) {
+    $regexData = '/^\d{4}-\d{2}-\d{2}$/';
+    return preg_match($regexData, $data_nasc);
+}
+
+function enviarEmailConfirmacao($email, $token) {
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'buscavetpucpr@gmail.com';
+        $mail->Password = 'sua senha aqui';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        $mail->setFrom('buscavetpucpr@gmail.com', 'BuscaVet');
+        $mail->addAddress($email);
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Confirmação de Cadastro';
+        $mail->Body = "Clique aqui para confirmar seu cadastro: <a href='http://localhost/php/confirmar_usuario.php?token={$token}'>Confirmar Cadastro</a>";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Erro ao enviar e-mail: {$mail->ErrorInfo}");
+        return false;
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $conn = new mysqli(servername, username, password, database);
+    if ($conn) {
+        $name = $_POST['name'];
+        $login = $_POST['login'];
+        $email = $_POST['email'];
+        $cpf = $_POST['cpf'];
+        $data_nasc = $_POST['data_nasc'];
+        $password = $_POST['password'];
+        $phone = $_POST['phone'] ?? '';
+
+        if (!validarEmail($email)) {
+            ob_end_clean();
+            echo json_encode(["mensagem" => "E-mail inválido."]);
+            exit;
+        }
+
+        if (!validarCpfCnpj($cpf)) {
+            ob_end_clean();
+            echo json_encode(["mensagem" => "CPF/CNPJ inválido."]);
+            exit;
+        }
+
+        if (!validarDataNasc($data_nasc)) {
+            ob_end_clean();
+            echo json_encode(["mensagem" => "Data de nascimento inválida."]);
+            exit;
+        }
+
+        if (!validarSenha($password)) {
+            ob_end_clean();
+            echo json_encode(["mensagem" => "A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial."]);
+            exit;
+        }
+
+        // SHA-256 Hashing
+        $passwordHashed = hash('sha256', $password);
+        $stmt = $conn->prepare("INSERT INTO usuario (name, login, email, data_nasc, cpf, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, 'sssssss', $name, $login, $email, $data_nasc, $cpf, $passwordHashed, $phone);
+
+        if (mysqli_stmt_execute($stmt)) {
+            $token = bin2hex(random_bytes(50));
+            $updateTokenStmt = mysqli_prepare($conn, "UPDATE usuario SET token = ? WHERE email = ?");
+            mysqli_stmt_bind_param($updateTokenStmt, 'ss', $token, $email);
+            mysqli_stmt_execute($updateTokenStmt);
+            mysqli_stmt_close($updateTokenStmt);
+
+            if (enviarEmailConfirmacao($email, $token)) {
+                ob_end_clean();
+                echo json_encode(["mensagem" => "Usuário cadastrado com sucesso! E-mail de confirmação enviado."]);
+            } else {
+                ob_end_clean();
+                echo json_encode(["mensagem" => "Usuário cadastrado. Erro ao enviar e-mail de confirmação."]);
+            }
+        } else {
+            ob_end_clean();
+            echo json_encode(["mensagem" => "Erro ao cadastrar o usuário: " . mysqli_stmt_error($stmt)]);
+        }
+
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
+    } else {
+        ob_end_clean();
+        echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . mysqli_connect_error()]);
+    }
+} else {
+    ob_end_clean();
+    echo json_encode(["mensagem" => "Método de requisição inválido."]);
+}
+
+ob_end_flush();
 ?>

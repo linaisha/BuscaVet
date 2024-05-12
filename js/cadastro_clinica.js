@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
     else if (!validarCNPJ(cnpj)) alert("Por favor, insira um CNPJ válido.");
     else if (!endereco.trim()) alert("Por favor, preencha o campo endereco.");
     else if (!validarSenha(password))
-      alert("A senha não atende aos requisitos mínimos.");
+      alert("A senha não atende aos requisitos mínimos. Mínimo de 8 caracteres dentre eles uma letra minúscula, uma letra maiúscula, um caractere especial e um número.");
     else if (password !== check_password) alert("As senhas não coincidem.");
     else {
       const formData = new FormData(clinicaForm);

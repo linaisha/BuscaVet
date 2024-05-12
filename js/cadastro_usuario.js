@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (!validarSenha(password)) {
-      alert("A senha não atende aos requisitos mínimos.");
+      alert("A senha não atende aos requisitos mínimos. Mínimo de 8 caracteres dentre eles uma letra minúscula, uma letra maiúscula, um caractere especial e um número.");
       return;
     }
 

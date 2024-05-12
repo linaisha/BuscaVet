@@ -36,24 +36,23 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-    $user = $result->fetch_assoc();
+    $clinica = $result->fetch_assoc();
 
-    if ($user['confirmacao'] != 1) {
+    if ($clinica['confirmacao'] != 1) {
         echo json_encode(['success' => false, 'message' => 'Conta não confirmada. Por favor, verifique seu e-mail.']);
         $stmt->close();
         $conn->close();
         exit;
     }
 
-    // Agora compara os hashes SHA-256 diretamente
-    if ($user['password'] === $hashedPassword) {
-        $_SESSION['login_user_id'] = $user['id'];
-        $_SESSION['login_user_email'] = $user['email'];
+    if ($clinica['password'] === $hashedPassword) {
+        $_SESSION['clinica_id'] = $clinica['id'];
+        $_SESSION['login_clinica_email'] = $clinica['email'];
 
         $codigo_verificacao = rand(100000, 999999);
         $codigo_verificacao_expira = (new DateTime())->add(new DateInterval('PT10M'))->format('Y-m-d H:i:s');
         $updateStmt = $conn->prepare("UPDATE clinica SET codigo_verificacao = ?, codigo_verificacao_expira = ? WHERE id = ?");
-        $updateStmt->bind_param('ssi', $codigo_verificacao, $codigo_verificacao_expira, $user['id']);
+        $updateStmt->bind_param('ssi', $codigo_verificacao, $codigo_verificacao_expira, $clinica['id']);
         $updateStmt->execute();
         $updateStmt->close();
 
@@ -66,7 +65,7 @@ if ($result->num_rows > 0) {
 
         try {
             $message = $client->messages->create(
-                $user['phone'],
+                $clinica['phone'],
                 [
                     'from' => $twilioPhoneNumber,
                     'body' => "Seu código de verificação é: {$codigo_verificacao}"

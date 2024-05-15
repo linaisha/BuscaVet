@@ -1,6 +1,5 @@
 <?php
 include 'config.php';
-
 ob_start(); // Inicia controle de buffer
 session_start();
 
@@ -32,7 +31,7 @@ if ($result->num_rows > 0) {
     $user = $result->fetch_assoc();
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_name'] = $user['name'];
-    echo json_encode(['success' => true, 'message' => 'Código verificado com sucesso.']);
+    echo json_encode(['success' => true, 'message' => 'Código verificado com sucesso.', 'redirect' => '../php/verifica_sessao_usuario.php']);
 } else {
     echo json_encode(['success' => false, 'message' => 'Código inválido ou expirado.']);
 }

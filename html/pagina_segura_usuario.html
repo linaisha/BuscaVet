@@ -1,0 +1,19 @@
+<?php include '../php/verifica_sessao_usuario.php'; ?>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Página Segura</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="cabecalho">
+        <h2>Bem-vindo à Página Segura, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</h2>
+    </header>
+    <main>
+        <p>Esta é uma página segura. Seu login foi bem-sucedido!</p>
+        <p><a href="../php/verifica_sessao_usuario1.php">Ir para Página 2</a></p>
+        <p><a href="../php/logout.php">Sair</a></p>
+    </main>
+</body>
+</html>

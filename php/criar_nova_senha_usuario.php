@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include '../../TotalmenteSeguro/config.php';
 
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';

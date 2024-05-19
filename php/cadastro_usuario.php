@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include '../../TotalmenteSeguro/config.php';
 
 ob_start();
 error_reporting(0);

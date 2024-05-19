@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include '../../TotalmenteSeguro/config.php';
 
 ob_start();
 ini_set('display_errors', 1);

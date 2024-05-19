@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include '../../TotalmenteSeguro/config.php';
 
 $conn = new mysqli(servername, username, password, database);
 

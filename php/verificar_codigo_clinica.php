@@ -28,8 +28,9 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $clinic = $result->fetch_assoc();
+    $_SESSION['clinica_id'] = $clinic['id'];
     $_SESSION['clinica_name'] = $clinic['name'];
-    echo json_encode(['success' => true, 'message' => 'Código verificado com sucesso.', 'redirect' => 'pagina_segura_clinica.php']);
+    echo json_encode(['success' => true, 'message' => 'Código verificado com sucesso.', 'redirect' => '../php/verifica_sessao_clinica.php']);
 } else {
     echo json_encode(['success' => false, 'message' => 'Código inválido ou expirado.']);
 }

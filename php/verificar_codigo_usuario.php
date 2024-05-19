@@ -1,19 +1,18 @@
 <?php
 include 'config.php';
-ob_start(); // Inicia controle de buffer
+
+ob_start();
 session_start();
 
-header('Content-Type: application/json'); // Define header para JSON
+header('Content-Type: application/json');
 
 $conn = new mysqli(servername, username, password, database);
 
-// Verifica conexão
 if ($conn->connect_error) {
     echo json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]);
     exit;
 }
 
-// Verifica se código foi enviado
 if (empty($_POST['verification_code'])) {
     echo json_encode(['success' => false, 'message' => 'Código de verificação é necessário.']);
     exit;
@@ -38,5 +37,5 @@ if ($result->num_rows > 0) {
 
 $stmt->close();
 $conn->close();
-ob_end_flush(); // Envia o buffer e desativa
+ob_end_flush();
 ?>

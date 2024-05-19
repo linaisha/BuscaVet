@@ -57,9 +57,9 @@ if ($result->num_rows > 0) {
         $updateStmt->close();
 
         require_once '../twilio/vendor/autoload.php';
-        $twilioSid = 'AC067590a3b1cdf1a1f05ff3cf7d41ed36';
-        $twilioToken = '7c0f1096a52587bf580db980bf56ffe9';
-        $twilioPhoneNumber = '13203968435';
+        $twilioSid = 'AC986807cad58fd6a8134f2a3f8c80a9c7';
+        $twilioToken = '38c444a3f2399d7a98794f627becf25b';
+        $twilioPhoneNumber = '14793485734';
 
         $client = new Twilio\Rest\Client($twilioSid, $twilioToken);
 

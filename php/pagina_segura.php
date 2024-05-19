@@ -1,8 +1,4 @@
 <?php
-// include 'config.php';
-// $conn = new mysqli(servername, username, password, database);
-
-
 session_start();
 
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_name'])) {

@@ -1,5 +1,5 @@
 <?php
-include '../../TotalmenteSeguro/config.php';
+include '../../TotalmenteSeguro/decode_config.php';
 
 ob_start();
 ini_set('display_errors', 1);
@@ -52,7 +52,7 @@ function validarCnpj($cnpj) {
     }
 }
 
-$conn = new mysqli(servername, username, password, database);
+$conn = new mysqli($servername, $username, $password, $database);
 
 if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]));

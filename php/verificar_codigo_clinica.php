@@ -1,12 +1,12 @@
 <?php
-include '../../TotalmenteSeguro/config.php';
+include '../../TotalmenteSeguro/decode_config.php';
 
 ob_start();
 session_start();
 
 header('Content-Type: application/json');
 
-$conn = new mysqli(servername, username, password, database);
+$conn = new mysqli($servername, $username, $password, $database);
 
 if ($conn->connect_error) {
     echo json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]);

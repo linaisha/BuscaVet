@@ -1,7 +1,7 @@
 <?php
-include '../../TotalmenteSeguro/config.php';
+include '../../TotalmenteSeguro/decode_config.php';
 
-$conn = new mysqli(servername, username, password, database);
+$conn = new mysqli($servername, $username, $password, $database);
 
 if (mysqli_connect_errno()) {
     echo "Falha na conexão com o banco de dados: " . mysqli_connect_error();

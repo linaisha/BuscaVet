@@ -1,5 +1,5 @@
 <?php
-include '../../TotalmenteSeguro/config.php';
+include '../../TotalmenteSeguro/decode_config.php';
 
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';
@@ -8,7 +8,7 @@ require '../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$conn = new mysqli(servername, username, password, database);
+$conn = new mysqli($servername, $username, $password, $database);
 if (!$conn) {
     die("Conexão falhou: " . mysqli_connect_error());
 }

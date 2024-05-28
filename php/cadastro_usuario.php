@@ -1,5 +1,5 @@
 <?php
-include '../../TotalmenteSeguro/decode_config.php';
+include 'decode_config.php';
 
 ob_start();
 error_reporting(0);

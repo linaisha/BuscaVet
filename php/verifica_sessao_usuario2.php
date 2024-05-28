@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id']) || (isset($_SESSION['LAST_ACTIVITY']) && (time(
     exit;
 }
 $userName = htmlspecialchars($_SESSION['user_name']);
-
 $_SESSION['LAST_ACTIVITY'] = time();
 setcookie("userName", htmlspecialchars($_SESSION['user_name']), time()+30);
 

@@ -1,5 +1,5 @@
 <?php
-include '../../TotalmenteSeguro/decode_config.php';
+include 'decode_config.php';
 
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';

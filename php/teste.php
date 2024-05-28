@@ -1,5 +1,5 @@
 <?php
-include '../../TotalmenteSeguro/decode_config.php';
+include 'decode_config.php';
 
 $conn = new mysqli($servername, $username, $password, $database);
 

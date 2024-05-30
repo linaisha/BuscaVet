@@ -1,17 +1,23 @@
 RewriteEngine On
 
-# Proteger páginas HTML específicas e redirecionar para os scripts de verificação de sessão correspondentes
-RewriteCond %{REQUEST_URI} ^/html/pagina_segura_usuario.html$ [NC]
-RewriteRule ^(.*)$ /php/verifica_sessao_usuario.php?file=pagina_segura_usuario.html [L]
-
-RewriteCond %{REQUEST_URI} ^/html/pagina_segura_usuario2.html$ [NC]
-RewriteRule ^(.*)$ /php/verifica_sessao_usuario2.php?file=pagina_segura_usuario2.html [L]
-
-RewriteCond %{REQUEST_URI} ^/html/pagina_segura_clinica.html$ [NC]
-RewriteRule ^(.*)$ /php/verifica_sessao_clinica.php?file=pagina_segura_clinica.html [L]
-
-RewriteCond %{REQUEST_URI} ^/html/pagina_segura_clinica2.html$ [NC]
-RewriteRule ^(.*)$ /php/verifica_sessao_clinica2.php?file=pagina_segura_clinica2.html [L]
-
-# Impedir acesso direto à árvore de diretórios do localhost
 Options -Indexes
+
+<Files "pagina_segura_usuario.html">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "verifica_sessao_usuario.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+<Files "pagina_segura_usuario2.html">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "verifica_sessao_usuario2.php">
+    Order Allow,Deny
+    Allow from all
+</Files>

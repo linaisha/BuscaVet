@@ -2,23 +2,31 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Página Segura</title>
     <link rel="stylesheet" href="../css/style.css">
     <script src="../js/busca.js"></script>
 </head>
-<body>
+<body style="background-image: url('../img/BuscaVetLogo.png');">
     <header class="cabecalho">
         <div class="juntos">
-            <h2>Bem-vindo à Página Segura!</h2>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="../img/Logo.png" width="120" height="120">
+                </a>
+            </div>
+            <ul>
+                <li><a href="../php/verifica_sessao_clinica2.php" class="link">CLINICAS</a></li>
+                <li><a href="../php/logout_clinica.php" class="link">SAIR</a></li>
+            </ul>
             <div class="buscar">
-                <input type="text" id="input-busca" placeholder="Buscar..." />
+                <input type="text" id="input-busca" placeholder="Buscar...">
             </div>
         </div>
     </header>
-    <main>
+    <main class="container">
+        <h2>Bem-vindo à Página Segura!</h2>
         <p>Esta é uma página segura. Seu login foi bem-sucedido!</p>
-        <p><a href="../php/verifica_sessao_clinica2.php">Ir para Página 2</a></p>
-        <p><a href="../php/logout_clinica.php">Sair</a></p>
         <div class="card" id="listar-clinica"></div>
     </main>
 </body>

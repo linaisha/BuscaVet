@@ -1,10 +1,9 @@
 body {
-  margin: 0px;
-  background-repeat: no-repeat no-repeat;
+  margin: 0;
+  background-repeat: no-repeat;
   background-size: cover;
   background-position: center 20%;
-  }
-
+}
 
 .cabecalho {
   background: linear-gradient(to bottom, #40ae2a, #f9d72f);
@@ -17,183 +16,232 @@ body {
   margin-bottom: 8px;
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  margin-left: 45px;
+}
 
-  .logo {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-    margin-left: 45px;
-  }
-  img{
-    filter: brightness(60%);
-  }
-  img:hover {
-    filter: brightness(100%);
-  }
-  ul {
-    display: flex;
-    gap: 1rem;
-    list-style: none;
-  }
-  .link{
-    text-decoration: none;
-    color: black;
-    font-size: 22px;
-    padding: 1rem 3rem;
-    position: relative;
-    margin-left: 50px;
-    font-family: Bradley Hand, cursive;
-  }
-  .link::before,
-  .link::after{
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    background: #f9d72f;
-    transform: scaleX(0);
-    transition: all 0.6s ease;
-    }
-  .link::before {
-    top: 0;
-    left: 0;
-    transform-origin: left;
-  }
-  .link::after{
-    bottom: 0;
-    left: 0;
-    transform-origin: right;
-  }
-  .link:hover::before,
-  .link:hover::after {
-    transform: scaleX(1);
-  }
-  .form-rec-senha,
-  .form-cadastro,
-  .form-cadastro-clinica,
-  .form-login,
-  .form-nova-senha,
-  .form-token,
-  .form-especie{ animation: fadeIn 2s; }
-    @keyframes fadeIn {
-    0% {opacity: 0;}
-    50% {opacity: 1;}
-    100% {opacity: 2;}}
+img {
+  filter: brightness(60%);
+}
 
+img:hover {
+  filter: brightness(100%);
+}
 
-  .form-rec-senha,
-  .form-cadastro,
-  .form-cadastro-clinica,
-  .form-login,
-  .form-nova-senha,
-  .form-token,
-  .form-especie{
-    background-color: #f9d72f;
-    padding: 20px 30px;
-    border-radius: 35% 10% 35% 10% / 20% 35% 20% 35%;
-    width: 100%;  
-    max-width: 400px;  
-    font-family: Bradley Hand, cursive;
-    border: 2px solid black;
-  } 
+ul {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+}
 
+.link {
+  text-decoration: none;
+  color: black;
+  font-size: 22px;
+  padding: 1rem 3rem;
+  position: relative;
+  margin-left: 50px;
+  font-family: Bradley Hand, cursive;
+}
 
-  #titulo_geral{
-    font-family: Bradley Hand, cursive;
-    margin-bottom: 7px;
-    text-align: center;
-  }
- #titulo_geral { animation: fadeIn 2s; }
-  @keyframes fadeIn {
-  0% {opacity: 0;}
-  50% {opacity: 1;}
-  100% {opacity: 2;}}
-  #titulo_geral {
-    color: #f9d72f;
-    font-family: Bradley Hand, cursive;
-    font-size: 30px;
-    text-align: center;
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: #000;
-    display: flex;
-    flex-direction: column;
-    margin-top: 80px;
-  }
- 
-  .rec-senha,
-  .cadastro,
-  .cadastro-clinica,
-  .login,
-  .nova-senha,
-  .token,
-  .especie {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    font-family: Bradley Hand, cursive;
-    justify-content: flex-start;
-    flex-direction: column;
-  }
- 
-  .input-container {
-    margin-bottom: 20px;
-    text-align: center;
-  }
- 
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
- 
-  input[type="text"],
-  input[type="password"] {
-    padding: 10px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    width: 250px;
-    font-size: 16px;
-    outline: none;
-    font-family: Bradley Hand, cursive;
-    box-shadow: 1px 5px 5px 1px black;
-  }
+.link::before,
+.link::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #f9d72f;
+  transform: scaleX(0);
+  transition: all 0.6s ease;
+}
 
+.link::before {
+  top: 0;
+  left: 0;
+  transform-origin: left;
+}
 
-  form.form-rec-senha,
-  form.form-cadastro,
-  form.form-cadastro-clinica,
-  form.form-login,
-  form.form-nova-senha,
-  form.form-token,
-  form.form-especie{
-    text-align: center;
-  }
- 
-  button[type="submit"] {
-    background: linear-gradient(to bottom, #40ae2a, #40ae2a);
-    color: #fff;
-    border: none;
-    padding: 7px 13px;
-    margin-top: 10px;
-    cursor: pointer;
-    border-radius: 20px;
-    font-family: Bradley Hand, cursive;
-    box-shadow: 1px 5px 5px 1px black;
-    filter: brightness(80%);
-  }
-  button:hover{
-    filter: brightness(100%);
-  }
-  select{
-    appearance: none;
-    border: 1px solid;
-    padding: 20px;
-    width: 400px;
-    height: 30px;
-    background: #f9d72f;
-    filter: brightness(85%);
-    border-radius: 20% 35% 20% 35% / 35% 10% 35% 10%;
-    font-family: Bradley Hand, cursive;
-    font-size: 20px;
-    text-align: center;
-  }
-  
+.link::after {
+  bottom: 0;
+  left: 0;
+  transform-origin: right;
+}
+
+.link:hover::before,
+.link:hover::after {
+  transform: scaleX(1);
+}
+
+.form-rec-senha,
+.form-cadastro,
+.form-cadastro-clinica,
+.form-login,
+.form-nova-senha,
+.form-token,
+.form-especie {
+  animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 2; }
+}
+
+.form-rec-senha,
+.form-cadastro,
+.form-cadastro-clinica,
+.form-login,
+.form-nova-senha,
+.form-token,
+.form-especie {
+  background-color: #f9d72f;
+  padding: 20px 30px;
+  border-radius: 35% 10% 35% 10% / 20% 35% 20% 35%;
+  width: 100%;
+  max-width: 400px;
+  font-family: Bradley Hand, cursive;
+  border: 2px solid black;
+}
+
+#titulo_geral {
+  font-family: Bradley Hand, cursive;
+  margin-bottom: 7px;
+  text-align: center;
+  color: #f9d72f;
+  font-size: 30px;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #000;
+  display: flex;
+  flex-direction: column;
+  margin-top: 80px;
+  animation: fadeIn 2s;
+}
+
+.rec-senha,
+.cadastro,
+.cadastro-clinica,
+.login,
+.nova-senha,
+.token,
+.especie {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-family: Bradley Hand, cursive;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+.input-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="password"] {
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  width: 250px;
+  font-size: 16px;
+  outline: none;
+  font-family: Bradley Hand, cursive;
+  box-shadow: 1px 5px 5px 1px black;
+}
+
+form.form-rec-senha,
+form.form-cadastro,
+form.form-cadastro-clinica,
+form.form-login,
+form.form-nova-senha,
+form.form-token,
+form.form-especie {
+  text-align: center;
+}
+
+button[type="submit"] {
+  background: linear-gradient(to bottom, #40ae2a, #40ae2a);
+  color: #fff;
+  border: none;
+  padding: 7px 13px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 20px;
+  font-family: Bradley Hand, cursive;
+  box-shadow: 1px 5px 5px 1px black;
+  filter: brightness(80%);
+}
+
+button:hover {
+  filter: brightness(100%);
+}
+
+select {
+  appearance: none;
+  border: 1px solid #000;
+  padding: 10px 20px;
+  width: 100%;
+  max-width: 250px;
+  background: #f9d72f;
+  filter: brightness(85%);
+  border-radius: 20% 35% 20% 35% / 35% 10% 35% 10%;
+  font-family: Bradley Hand, cursive;
+  font-size: 16px;
+  text-align: center;
+  box-shadow: 1px 5px 5px 1px black;
+  color: #000;
+}
+
+select:focus {
+  outline: none;
+  box-shadow: 0 0 5px #000;
+}
+
+option {
+  color: #000;
+}
+
+.clinica-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #000;
+  padding: 10px;
+  margin: 3px;
+  width: 250px;
+}
+
+.card-interior {
+  background: linear-gradient(to bottom, #f9d72f, #ffeb99);
+  border: solid 2px black;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 7px 7px 5px rgba(0, 0, 0, 0.3);
+}
+
+.card-nome-clinica,
+.card-telefone-clinica,
+.card-endereco-clinica,
+.card-email-clinica,
+.card-especializacao-clinica {
+  width: 100%;
+  text-align: center;
+  margin: 5px 0;
+}
+
+.card-nome-clinica {
+  font-weight: bold;
+  font-size: 1.2em;
+}

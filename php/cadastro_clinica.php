@@ -24,32 +24,9 @@ function validarEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-function validarCnpj($cnpj) {
-    $cnpj = preg_replace('/\D/', '', $cnpj);
-    if (strlen($cnpj) !== 14)
-        return false;
-
-    $calculo = 0;
-    $calculo2 = 0;
-    $regra = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-
-    for ($i = 0; $i < 12; $i++) {
-        $calculo = $calculo + ($cnpj[$i] * $regra[$i + 1]);
-    }
-
-    $calculo = ($calculo % 11 < 2) ? 0 : 11 - ($calculo % 11);
-
-    for ($i = 0; $i < 13; $i++) {
-        $calculo2 = $calculo2 + ($cnpj[$i] * $regra[$i]);
-    }
-
-    $calculo2 = ($calculo2 % 11 < 2) ? 0 : 11 - ($calculo2 % 11);
-
-    if ($calculo != $cnpj[12] || $calculo2 != $cnpj[13]) {
-        return false;
-    } else {
-        return true;
-    }
+function validarCRMV($crmv) {
+    $regex = '/^[A-Z]{2}\/\d+$/';
+    return preg_match($regex, $crmv);
 }
 
 $conn = new mysqli($servername, $username, $password, $database);
@@ -62,21 +39,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $conn->real_escape_string($_POST['name']);
     $login = $conn->real_escape_string($_POST['login']);
     $email = $conn->real_escape_string($_POST['email']);
-    $cnpj = $conn->real_escape_string($_POST['cnpj']);
+    $especializacao = $conn->real_escape_string($_POST['especializacao']);
     $endereco = $conn->real_escape_string($_POST['endereco']);
     $crmv = $conn->real_escape_string($_POST['crmv']);
     $password = $_POST['password'];
     $phone = $conn->real_escape_string($_POST['phone']);
 
-    if (!validarEmail($email) || !validarSenha($password) || !validarCnpj($cnpj)) {
+    if (!validarEmail($email) || !validarSenha($password) || !validarCRMV($crmv)) {
         echo json_encode(['success' => false, 'message' => 'Validação falhou']);
         exit;
     }
 
     $passwordHashed = hash('sha256', $password);
 
-    $stmt = $conn->prepare("INSERT INTO clinica (name, login, email, cnpj, endereco, crmv, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssss", $name, $login, $email, $cnpj, $endereco, $crmv, $passwordHashed, $phone);
+    $stmt = $conn->prepare("INSERT INTO clinica (name, login, email, especializacao, endereco, crmv, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssss", $name, $login, $email, $especializacao, $endereco, $crmv, $passwordHashed, $phone);
 
     if ($stmt->execute()) {
         $token = bin2hex(random_bytes(16));

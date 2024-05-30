@@ -2,17 +2,43 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Página Segura</title>
+    <title>Página de Perfil da Clínica</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
     <header class="cabecalho">
-        <h2>Bem-vindo à Página Segura 2!</h2>
+        <h2>Bem-vindo ao Perfil da Clínica!</h2>
     </header>
     <main>
-        <p>Esta é uma página segura. Seu login foi bem-sucedido!</p>
-        <p><a href="../php/verifica_sessao_clinica.php">Ir para Página</a></p>
+        <p>Edite as informações da clínica abaixo:</p>
+        <form id="form-perfil-clinica" action="../php/atualizar_perfil_clinica.php" method="post">
+            <div class="input-container">
+                <label for="name">Nome</label>
+                <input type="text" name="name" id="name" required>
+            </div>
+            <div class="input-container">
+                <label for="especializacao">Especialização</label>
+                <select name="especializacao" id="especializacao" required>
+                    <option value="peixes">Peixes</option>
+                    <option value="anfibios">Anfíbios</option>
+                    <option value="repteis">Répteis</option>
+                    <option value="aves">Aves</option>
+                    <option value="mamiferos">Mamíferos</option>
+                </select>
+            </div>
+            <div class="input-container">
+                <label for="email">E-mail</label>
+                <input type="email" name="email" id="email" required>
+            </div>
+            <div class="input-container">
+                <label for="phone">Telefone</label>
+                <input type="tel" name="phone" id="phone" required>
+            </div>
+            <button type="submit">Atualizar</button>
+        </form>
+        <p><a href="../php/verifica_sessao_clinica.php">Voltar para Página Segura</a></p>
         <p><a href="../php/logout_clinica.php">Sair</a></p>
     </main>
+    <script src="../js/perfil_clinica.js"></script>
 </body>
 </html>

@@ -8,4 +8,9 @@ if ($conn->connect_error) {
 }
 
 echo "Conexão bem-sucedida!";
+
+
+echo json_encode(['success' => true, 'message' => 'Teste bem-sucedido']);
+
+
 ?>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-$session_lifetime = 30;
+$session_lifetime = 900;
 
 if (!isset($_SESSION['user_id']) || (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $session_lifetime))) {
     session_unset();

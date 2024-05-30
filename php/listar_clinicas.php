@@ -1,9 +1,9 @@
 <?php
-include 'decode_config.php';
+include 'decode_cred.php';
 
 header('Content-Type: application/json');
 
-$conn = new mysqli($servername, $username, $password, $database);
+$conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
 if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]));

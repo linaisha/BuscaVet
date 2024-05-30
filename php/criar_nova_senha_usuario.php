@@ -1,5 +1,5 @@
 <?php
-include 'decode_config.php';
+include 'decode_cred.php';
 
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';
@@ -8,7 +8,7 @@ require '../PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-$conn = new mysqli($servername, $username, $password, $database);
+$conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 if (!$conn) {
     die("Falha na conexão: " . mysqli_connect_error());
 }

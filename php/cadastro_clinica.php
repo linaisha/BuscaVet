@@ -1,5 +1,5 @@
 <?php
-include 'decode_config.php';
+include 'decode_cred.php';
 
 ob_start();
 ini_set('display_errors', 1);
@@ -29,7 +29,7 @@ function validarCRMV($crmv) {
     return preg_match($regex, $crmv);
 }
 
-$conn = new mysqli($servername, $username, $password, $database);
+$conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
 if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]));

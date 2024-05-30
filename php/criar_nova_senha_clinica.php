@@ -1,5 +1,5 @@
 <?php
-include 'decode_config.php';
+include 'decode_cred.php';
 
 ob_start();
 error_reporting(0);
@@ -60,7 +60,7 @@ function enviarEmailConfirmacao($email, $token) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $conn = new mysqli($servername, $username, $password, $database);
+    $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
     if ($conn) {
         $name = $_POST['name'];
         $login = $_POST['login'];

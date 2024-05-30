@@ -1,7 +1,7 @@
 <?php
-session_start();
-include 'decode_config.php';
+include 'decode_cred.php';
 
+session_start();
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$conn = new mysqli($servername, $username, $password, $database);
+$conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
 if ($conn->connect_error) {
     echo json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]);

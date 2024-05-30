@@ -1,16 +1,11 @@
 <?php
-include 'decode_config.php';
+include 'decode_cred.php';
 
-$conn = new mysqli($servername, $username, $password, $database);
+$conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
 if ($conn->connect_error) {
     die("Conexão falhou: " . $conn->connect_error);
 }
 
 echo "Conexão bem-sucedida!";
-
-
-echo json_encode(['success' => true, 'message' => 'Teste bem-sucedido']);
-
-
 ?>

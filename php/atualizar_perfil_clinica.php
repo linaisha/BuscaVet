@@ -22,15 +22,16 @@ $name = $conn->real_escape_string($_POST['name']);
 $especializacao = $conn->real_escape_string($_POST['especializacao']);
 $email = $conn->real_escape_string($_POST['email']);
 $phone = $conn->real_escape_string($_POST['phone']);
+$endereco = $conn->real_escape_string($_POST['endereco']);
 
-$sql = "UPDATE clinica SET name = ?, especializacao = ?, email = ?, phone = ? WHERE id = ?";
+$sql = "UPDATE clinica SET name = ?, especializacao = ?, email = ?, phone = ?, endereco = ? WHERE id = ?";
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
     echo json_encode(['success' => false, 'message' => 'Erro ao preparar a query: ' . $conn->error]);
     exit;
 }
 
-$stmt->bind_param("ssssi", $name, $especializacao, $email, $phone, $clinica_id);
+$stmt->bind_param("sssssi", $name, $especializacao, $email, $phone, $endereco, $clinica_id);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true, 'message' => 'Perfil atualizado com sucesso']);

@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("especializacao").value = data.data.especializacao;
             document.getElementById("email").value = data.data.email;
             document.getElementById("phone").value = data.data.phone;
+            document.getElementById("endereco").value = data.data.endereco; // Novo campo
         })
         .catch(error => console.error("Erro ao carregar perfil:", error));
 

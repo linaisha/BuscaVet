@@ -1,28 +1,58 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Página Segura 2</title>
+    <meta charset="utf-8">
     <link rel="stylesheet" href="../css/style.css">
+  <title> BuscaVet - Pagina Segura 2</title>
+  <link rel="icon" href="/img/Logo.png">
 </head>
-
 <body style="background-image: url('../img/BuscaVetLogo.png');">
-        <header class="cabecalho">
-            <div class="juntos">
-                <div class="logo">
-                  <a href="index.html">
-                    <img src="../img/Logo.png" width="120" height="120">
-                  </a>
-        <a href="../php/verifica_sessao_clinica.php" class="link">Ir para Página</a>
-        <a href="../php/logout_clinica.php" class="link">Sair </a>
-                </div>
+  <header class="cabecalho">
+      <div class="juntos">
+          <div class="logo">
+            <a href="index.html">
+              <img src="../img/Logo.png" width="120" height="120">
+            </a>
+
+          <ul>
+              <li><a href="../php/verifica_sessao_clinica.php" class="link">Voltar para Página Segura</a></li>
+              <li><a href="../php/logout_clinica.php" class="link">Sair</a></li>
+          </ul>
+    </header>
+  <h2 id="titulo_geral">Bem-vindo ao Perfil da Clínica!</h2>
+  <h1 id="titulo_geral">Edite as informações da clínica abaixo:</h1>
+  <div id="login" class="login">
+        <form id="form-perfil-clinica" action="../php/atualizar_perfil_clinica.php" method="post" class="form-login">
+            <div class="input-container">
+                <label for="name">Nome</label>
+                <input type="text" name="name" id="name" required>
             </div>
-        </header>
-    <main>
-        <h2 id="titulo_geral"> Bem Vindo à Página Segura 2!</h2>
-        <h2 id="titulo_geral">Esta é uma página segura. Seu login foi bem-sucedido!</h2>
-        <body style="background-image: url('../img/BuscaVetLogo.png');">
-        </body>
-    </main>
+            <div class="input-container">
+                <label for="especializacao">Especialização</label>
+                <select name="especializacao" id="especializacao" required>
+                    <option value="peixes">Peixes</option>
+                    <option value="anfibios">Anfíbios</option>
+                    <option value="repteis">Répteis</option>
+                    <option value="aves">Aves</option>
+                    <option value="mamiferos">Mamíferos</option>
+                </select>
+            </div>
+            <div class="input-container">
+                <label for="email">E-mail</label>
+                <input type="email" name="email" id="email" required>
+            </div>
+            <div class="input-container">
+                <label for="phone">Telefone</label>
+                <input type="tel" name="phone" id="phone" required>
+            </div>
+            <div class="input-container">
+                <label for="endereco">Endereço</label>
+                <input type="text" name="endereco" id="endereco" required>
+            </div>
+            <button type="submit">Atualizar</button>
+        </form>
+  </div>
+    <script src="../js/perfil_clinica.js"></script>
 </body>
 </html>

@@ -8,6 +8,26 @@ error_reporting(0);
 session_start();
 header('Content-Type: application/json');
 
+// Configurações do caminho para os arquivos de certificado e chave privada
+$certPath = '../chavesTeste/certificate.pem';
+$privateKeyPath = '../chavesTeste/private_key.pem';
+
+// Verificar se os arquivos existem
+if (!file_exists($certPath) || !file_exists($privateKeyPath)) {
+    echo json_encode(['success' => false, 'message' => 'Certificado ou chave privada não encontrados.']);
+    exit;
+}
+
+// Leitura do certificado e da chave privada
+$publicKey = file_get_contents($certPath);
+$privateKey = openssl_pkey_get_private(file_get_contents($privateKeyPath));
+
+if (!$privateKey) {
+    echo json_encode(['success' => false, 'message' => 'Falha ao carregar a chave privada.']);
+    exit;
+}
+
+// Conectar ao banco de dados
 $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
 if ($conn->connect_error) {
@@ -15,14 +35,23 @@ if ($conn->connect_error) {
     exit;
 }
 
+// Receber os dados do formulário
 $email = isset($_POST['email']) ? $conn->real_escape_string($_POST['email']) : '';
-$hashedPassword = isset($_POST['password']) ? $_POST['password'] : '';
+$encryptedPassword = isset($_POST['password']) ? $_POST['password'] : '';
 
-if (empty($email) || empty($hashedPassword)) {
+if (empty($email) || empty($encryptedPassword)) {
     echo json_encode(['success' => false, 'message' => 'Email e senha são obrigatórios.']);
     exit;
 }
 
+// Decriptar a senha recebida
+$decryptedPassword = '';
+if (!openssl_private_decrypt(base64_decode($encryptedPassword), $decryptedPassword, $privateKey)) {
+    echo json_encode(['success' => false, 'message' => 'Erro ao decriptar a senha.']);
+    exit;
+}
+
+// Consultar a clínica no banco de dados
 $query = "SELECT id, name, email, password, confirmacao, phone FROM clinica WHERE email = ?";
 $stmt = $conn->prepare($query);
 
@@ -45,7 +74,7 @@ if ($result->num_rows > 0) {
         exit;
     }
 
-    if ($clinica['password'] === $hashedPassword) {
+    if (password_verify($decryptedPassword, $clinica['password'])) {
         $_SESSION['clinica_id'] = $clinica['id'];
         $_SESSION['login_clinica_email'] = $clinica['email'];
 

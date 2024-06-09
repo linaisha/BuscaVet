@@ -45,30 +45,40 @@ document.addEventListener("DOMContentLoaded", function () {
     const especializacao = document.getElementById("especializacao").value;
     const password = document.getElementById("password").value;
     const check_password = document.getElementById("check_password").value;
+    const phone = document.getElementById("phone").value;
 
-    if (!name.trim()) alert("Por favor, preencha o campo de nome.");
-    else if (!login.trim()) alert("Por favor, preencha o campo de login.");
-    else if (!validarCRMV(crmv)) alert("Por favor, insira um CRMV válido.");
-    else if (!validarEmail(email)) alert("Por favor, insira um e-mail válido.");
-    else if (!endereco.trim()) alert("Por favor, preencha o campo endereco.");
-    else if (!especializacao) alert("Por favor, selecione uma especialização.");
-    else if (!validarSenha(password))
+    if (!name.trim()) {
+      alert("Por favor, preencha o campo de nome.");
+    } else if (!login.trim()) {
+      alert("Por favor, preencha o campo de login.");
+    } else if (!validarCRMV(crmv)) {
+      alert("Por favor, insira um CRMV válido.");
+    } else if (!validarEmail(email)) {
+      alert("Por favor, insira um e-mail válido.");
+    } else if (!endereco.trim()) {
+      alert("Por favor, preencha o campo endereço.");
+    } else if (!especializacao) {
+      alert("Por favor, selecione uma especialização.");
+    } else if (!validarSenha(password)) {
       alert("A senha não atende aos requisitos mínimos. Mínimo de 8 caracteres dentre eles uma letra minúscula, uma letra maiúscula, um caractere especial e um número.");
-    else if (password !== check_password) alert("As senhas não coincidem.");
-    else {
+    } else if (password !== check_password) {
+      alert("As senhas não coincidem.");
+    } else {
       const formData = new FormData(clinicaForm);
 
       fetch("../php/cadastro_clinica.php", {
         method: "POST",
         body: formData,
       })
-        .then((response) => response.json())
-        .then((data) => {
-          alert(data.mensagem);
-          clinicaForm.reset();
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message);
+          if (data.success) {
+            clinicaForm.reset();
+          }
         })
-        .catch((error) => {
-          console.error("Error:", error);
+        .catch(error => {
+          console.error("Erro na requisição: ", error);
           alert("Erro ao cadastrar a clínica: " + error.message);
         });
     }

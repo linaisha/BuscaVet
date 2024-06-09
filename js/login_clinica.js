@@ -1,46 +1,61 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const formLogin = document.querySelector("#login form");
+  const form = document.getElementById("form-login");
 
-  // Carregar o certificado
-  fetch('../chaves/certificate.pem')
-    .then(response => response.text())
-    .then(certificate => {
-      const publicKey = certificate;
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-      formLogin.addEventListener("submit", function (event) {
-        event.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+    fetch("../chaves/public_key.pem")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erro ao carregar a chave pública.");
+        }
+        return response.text();
+      })
+      .then((publicKey) => {
+        console.log("Chave pública carregada: " + publicKey);
 
-        // Criptografar a senha com a chave pública
         const encrypt = new JSEncrypt();
         encrypt.setPublicKey(publicKey);
+
         const encryptedPassword = encrypt.encrypt(password);
+        console.log("Senha criptografada: " + encryptedPassword);
+
+        if (!encryptedPassword) {
+          alert("Erro ao criptografar a senha.");
+          return;
+        }
 
         const formData = new FormData();
-        formData.append('email', email);
-        formData.append('password', encryptedPassword);
+        formData.append("email", email);
+        formData.append("password", encryptedPassword);
 
         fetch("../php/autenticacao_login_clinica.php", {
           method: "POST",
           body: formData,
         })
-          .then(response => response.json())
-          .then(data => {
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Erro na resposta do servidor.");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            alert(data.message);
             if (data.success) {
               window.location.href = "verificar_codigo_clinica.html";
-            } else {
-              alert(data.message);
             }
           })
-          .catch(error => {
+          .catch((error) => {
             console.error("Erro na requisição: ", error);
             alert("Erro ao processar o login: " + error.message);
           });
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar a chave pública: ", error);
+        alert("Erro ao carregar a chave pública.");
       });
-    })
-    .catch(error => {
-      console.error("Erro ao carregar o certificado: ", error);
-    });
+  });
 });

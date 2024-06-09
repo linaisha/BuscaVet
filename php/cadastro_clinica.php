@@ -15,6 +15,7 @@ use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
+// Funções de validação
 function validarSenha($senha) {
     $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
     return preg_match($regex, $senha);
@@ -29,10 +30,12 @@ function validarCRMV($crmv) {
     return preg_match($regex, $crmv);
 }
 
+// Conexão ao banco de dados
 $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
 if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]));
+    echo json_encode(['success' => false, 'message' => 'Conexão falhou: ' . $conn->connect_error]);
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -50,16 +53,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $passwordHashed = hash('sha256', $password);
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     $stmt = $conn->prepare("INSERT INTO clinica (name, login, email, especializacao, endereco, crmv, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssss", $name, $login, $email, $especializacao, $endereco, $crmv, $passwordHashed, $phone);
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Erro ao preparar a consulta: ' . $conn->error]);
+        exit;
+    }
+    $stmt->bind_param("ssssssss", $name, $login, $email, $especializacao, $endereco, $crmv, $hashedPassword, $phone);
 
     if ($stmt->execute()) {
         $token = bin2hex(random_bytes(16));
         $expira = date("Y-m-d H:i:s", strtotime('+1 day'));
 
         $stmtUpdate = $conn->prepare("UPDATE clinica SET token = ?, token_expira = ? WHERE email = ?");
+        if (!$stmtUpdate) {
+            echo json_encode(['success' => false, 'message' => 'Erro ao preparar a consulta de atualização: ' . $conn->error]);
+            exit;
+        }
         $stmtUpdate->bind_param("sss", $token, $expira, $email);
         $stmtUpdate->execute();
         $stmtUpdate->close();
@@ -80,10 +91,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->Subject = 'Confirmação de Cadastro';
         $mail->Body = "Clique aqui para confirmar seu cadastro: <a href='http://localhost/php/confirmar_clinica.php?token={$token}'>Confirmar Cadastro</a>";
 
-        if ($mail->send()) {
+        try {
+            $mail->send();
             echo json_encode(['success' => true, 'message' => 'Clínica cadastrada e e-mail de confirmação enviado.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Clínica cadastrada, mas houve um erro ao enviar o e-mail de confirmação.']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Clínica cadastrada, mas houve um erro ao enviar o e-mail de confirmação. Erro: ' . $mail->ErrorInfo]);
         }
     } else {
         echo json_encode(['success' => false, 'message' => 'Erro ao cadastrar a clínica: ' . $stmt->error]);

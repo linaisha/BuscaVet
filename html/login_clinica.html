@@ -1,45 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="../css/style.css">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../css/style.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-beta.1/jsencrypt.min.js"></script>
     <script src="../js/login_clinica.js" defer></script>
     <title>BuscaVet - Login</title>
-    <link rel="icon" href="/img/Logo.png">
-</head>
-<body style="background-image: url('../img/BuscaVetLogo.png');">
+    <link rel="icon" href="/img/Logo.png" />
+  </head>
+  <body style="background-image: url('../img/BuscaVetLogo.png')">
     <header class="cabecalho">
-        <div class="juntos">
-            <div class="logo">
-                <a href="index.html">
-                    <img src="../img/Logo.png" width="120" height="120">
-                </a>
-            </div>
-            <ul>
-                <li><a href="index.html" class="link">PÁGINA INICIAL</a></li>
-                <li><a href="escolha_cadastro.html" class="link">CADASTRE-SE</a></li>
-            </ul>
+      <div class="juntos">
+        <div class="logo">
+          <a href="index.html">
+            <img src="../img/Logo.png" width="120" height="120" />
+          </a>
         </div>
+        <ul>
+          <li><a href="index.html" class="link">PÁGINA INICIAL</a></li>
+          <li><a href="escolha_cadastro.html" class="link">CADASTRE-SE</a></li>
+        </ul>
+      </div>
     </header>
     <h1 id="titulo_geral">Login</h1>
     <div id="login" class="login">
-        <form id="form-login" action="../php/autenticacao_login_clinica.php" method="post" class="form-login">
-            <div class="input-container">
-                <label for="email">E-mail</label>
-                <input type="text" name="email" id="email" required>
-            </div>
-            <div class="input-container">
-                <label for="password">Senha</label>
-                <input type="password" name="password" id="password" required>
-                <br>
-                <button type="submit">Enviar</button>
-            </div>
-            <a href="cadastro_usuario.html" class="link">Cadastre-se | Cliente</a>
-            <a href="cadastro_clinica.html" class="link">Cadastre-se | Clínica</a>
-            <a href="escolha_recuperacao.html" class="link">Esqueci minha senha</a>
-            <hr>
-        </form>
+      <form
+        id="form-login"
+        action="../php/autenticacao_login_clinica.php"
+        method="post"
+        class="form-login"
+      >
+        <div class="input-container">
+          <label for="email">E-mail</label>
+          <input type="text" name="email" id="email" required />
+        </div>
+        <div class="input-container">
+          <label for="password">Senha</label>
+          <input type="password" name="password" id="password" required />
+          <br />
+          <button type="submit">Enviar</button>
+        </div>
+        <a href="cadastro_usuario.html" class="link">Cadastre-se | Cliente</a>
+        <a href="cadastro_clinica.html" class="link">Cadastre-se | Clínica</a>
+        <a href="escolha_recuperacao.html" class="link">Esqueci minha senha</a>
+        <hr />
+      </form>
     </div>
-</body>
+  </body>
 </html>

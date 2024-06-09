@@ -14,12 +14,14 @@ $privateKeyPath = '../chaves/private_key.pem';
 $privateKeyPassword = 'TotalmenteOnline#69'; // Senha da chave privada
 
 // Função para registrar erros
-function log_error($message) {
+function log_error($message)
+{
     error_log($message, 3, '../logs/php-error.log');
 }
 
 // Função para retornar erros como JSON
-function return_json_error($message) {
+function return_json_error($message)
+{
     echo json_encode(['success' => false, 'message' => $message]);
     ob_end_flush();
     exit;

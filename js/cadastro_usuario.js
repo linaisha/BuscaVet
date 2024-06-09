@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const data_nasc = document.getElementById("data_nasc").value;
     const password = document.getElementById("password").value;
     const check_password = document.getElementById("check_password").value;
+    const phone = document.getElementById("phone").value;
 
     if (!name.trim()) {
       alert("Por favor, preencha o campo de nome.");
@@ -88,7 +89,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (!validarSenha(password)) {
-      alert("A senha não atende aos requisitos mínimos. Mínimo de 8 caracteres dentre eles uma letra minúscula, uma letra maiúscula, um caractere especial e um número.");
+      alert(
+        "A senha não atende aos requisitos mínimos. Mínimo de 8 caracteres dentre eles uma letra minúscula, uma letra maiúscula, um caractere especial e um número."
+      );
       return;
     }
 
@@ -97,26 +100,53 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const formData = new FormData(usuarioForm);
-
-    fetch("../php/cadastro_usuario.php", {
-      method: "POST",
-      body: formData,
-    })
+    fetch("../chaves/public_key.pem")
       .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return response.text().then((text) => {
-            throw new Error(text);
-          });
+        if (!response.ok) {
+          throw new Error("Erro ao carregar a chave pública.");
         }
+        return response.text();
       })
-      .then((data) => {
-        alert(data.mensagem);
+      .then((publicKey) => {
+        console.log("Chave pública carregada: " + publicKey);
+
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(publicKey);
+
+        const encryptedPassword = encrypt.encrypt(password);
+        console.log("Senha criptografada: " + encryptedPassword);
+
+        if (!encryptedPassword) {
+          alert("Erro ao criptografar a senha.");
+          return;
+        }
+
+        const formData = new FormData(usuarioForm);
+        formData.set("password", encryptedPassword);
+
+        fetch("../php/cadastro_usuario.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              return response.text().then((text) => {
+                throw new Error(text);
+              });
+            }
+          })
+          .then((data) => {
+            alert(data.mensagem);
+          })
+          .catch((error) => {
+            alert("Erro ao cadastrar o usuário: " + error.message);
+          });
       })
       .catch((error) => {
-        alert("Erro ao cadastrar o usuário: " + error.message);
+        console.error("Erro ao carregar a chave pública: ", error);
+        alert("Erro ao carregar a chave pública.");
       });
   });
 });

@@ -14,26 +14,31 @@ use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
-function validarSenha($senha) {
+function validarSenha($senha)
+{
     $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
     return preg_match($regex, $senha);
 }
 
-function validarEmail($email) {
+function validarEmail($email)
+{
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-function validarCpfCnpj($cpfCnpj) {
+function validarCpfCnpj($cpfCnpj)
+{
     $cleaned = preg_replace('/\D/', '', $cpfCnpj);
     return strlen($cleaned) === 11 || strlen($cleaned) === 14;
 }
 
-function validarDataNasc($data_nasc) {
+function validarDataNasc($data_nasc)
+{
     $regexData = '/^\d{4}-\d{2}-\d{2}$/';
     return preg_match($regexData, $data_nasc);
 }
 
-function enviarEmailConfirmacao($email, $token) {
+function enviarEmailConfirmacao($email, $token)
+{
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();

@@ -1,5 +1,6 @@
 <?php
-function decrypt($data, $key) {
+function decrypt($data, $key)
+{
     list($encrypted_data, $iv) = explode('::', base64_decode($data), 2);
     return openssl_decrypt($encrypted_data, 'aes-256-cbc', $key, 0, $iv);
 }

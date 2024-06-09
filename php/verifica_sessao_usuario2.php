@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || (isset($_SESSION['LAST_ACTIVITY']) && (time(
 }
 $userName = htmlspecialchars($_SESSION['user_name']);
 $_SESSION['LAST_ACTIVITY'] = time();
-setcookie("userName", htmlspecialchars($_SESSION['user_name']), time()+30);
+setcookie("userName", htmlspecialchars($_SESSION['user_name']), time() + 30);
 
 header('Location: ../html/pagina_segura_usuario2.html');
 exit;

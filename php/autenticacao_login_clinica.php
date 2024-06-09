@@ -2,28 +2,50 @@
 include 'decode_cred.php';
 
 ob_start();
-ini_set('display_errors', 0);
-error_reporting(0);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 session_start();
 header('Content-Type: application/json');
 
 // Configurações do caminho para os arquivos de certificado e chave privada
-$certPath = '../chavesTeste/certificate.pem';
-$privateKeyPath = '../chavesTeste/private_key.pem';
+$certPath = '../chaves/certificate.pem';
+$privateKeyPath = '../chaves/private_key.pem';
+
+// Função para registrar erros
+function log_error($message) {
+    error_log($message, 3, '/path/to/your/php-error.log');
+}
 
 // Verificar se os arquivos existem
-if (!file_exists($certPath) || !file_exists($privateKeyPath)) {
-    echo json_encode(['success' => false, 'message' => 'Certificado ou chave privada não encontrados.']);
+if (!file_exists($certPath)) {
+    log_error('Certificado não encontrado no caminho especificado: ' . $certPath);
+    echo json_encode(['success' => false, 'message' => 'Certificado não encontrado no caminho especificado.']);
+    exit;
+}
+
+if (!file_exists($privateKeyPath)) {
+    log_error('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
+    echo json_encode(['success' => false, 'message' => 'Chave privada não encontrada no caminho especificado.']);
     exit;
 }
 
 // Leitura do certificado e da chave privada
 $publicKey = file_get_contents($certPath);
-$privateKey = openssl_pkey_get_private(file_get_contents($privateKeyPath));
+$privateKeyContent = file_get_contents($privateKeyPath);
+
+if ($privateKeyContent === false) {
+    log_error('Erro ao ler o conteúdo da chave privada.');
+    echo json_encode(['success' => false, 'message' => 'Erro ao ler o conteúdo da chave privada.']);
+    exit;
+}
+
+$privateKey = openssl_pkey_get_private($privateKeyContent);
 
 if (!$privateKey) {
-    echo json_encode(['success' => false, 'message' => 'Falha ao carregar a chave privada.']);
+    $error = openssl_error_string();
+    log_error('Falha ao carregar a chave privada. Erro: ' . $error);
+    echo json_encode(['success' => false, 'message' => 'Falha ao carregar a chave privada. Erro: ' . $error]);
     exit;
 }
 
@@ -31,6 +53,7 @@ if (!$privateKey) {
 $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
 if ($conn->connect_error) {
+    log_error('Falha na conexão: ' . $conn->connect_error);
     echo json_encode(['success' => false, 'message' => 'Falha na conexão: ' . $conn->connect_error]);
     exit;
 }
@@ -47,6 +70,7 @@ if (empty($email) || empty($encryptedPassword)) {
 // Decriptar a senha recebida
 $decryptedPassword = '';
 if (!openssl_private_decrypt(base64_decode($encryptedPassword), $decryptedPassword, $privateKey)) {
+    log_error('Erro ao decriptar a senha.');
     echo json_encode(['success' => false, 'message' => 'Erro ao decriptar a senha.']);
     exit;
 }
@@ -56,6 +80,7 @@ $query = "SELECT id, name, email, password, confirmacao, phone FROM clinica WHER
 $stmt = $conn->prepare($query);
 
 if (!$stmt) {
+    log_error('Erro na consulta: ' . $conn->error);
     echo json_encode(['success' => false, 'message' => 'Erro na consulta: ' . $conn->error]);
     exit;
 }
@@ -103,6 +128,7 @@ if ($result->num_rows > 0) {
 
             echo json_encode(['success' => true, 'message' => 'Login bem-sucedido e SMS enviado.']);
         } catch (Exception $e) {
+            log_error('Erro ao enviar código de verificação: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Erro ao enviar código de verificação: ' . $e->getMessage()]);
         }
     } else {

@@ -2,28 +2,31 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Página Segura</title>
     <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/busca.js"></script>
 </head>
-
 <body style="background-image: url('../img/BuscaVetLogo.png');">
-        <header class="cabecalho">
-            <div class="juntos">
-                <div class="logo">
-                  <a href="index.html">
+    <header class="cabecalho">
+        <div class="juntos">
+            <div class="logo">
+                <a href="index.html">
                     <img src="../img/Logo.png" width="120" height="120">
-                  </a>
-        <a href="../php/verifica_sessao_clinica2.php" class="link">Ir para página 2/a>
-        <a href="../php/logout_clinica.php" class="link">Sair</a>
-                </div>
+                </a>
             </div>
-        </header>
-    <main>
-        <h2 id="titulo_geral">Bem-vindo à Página Segura!</h2>
-        <h2 id="titulo_geral">Esta é uma página segura. Seu login foi bem-sucedido!</h2>
-        
-        <body style="background-image: url('../img/BuscaVetLogo.png');">
-        </body>
+            <ul>
+                <li><a href="../php/verifica_sessao_clinica2.php" class="link">CLINICAS</a></li>
+                <li><a href="../php/logout_clinica.php" class="link">SAIR</a></li>
+            </ul>
+            <div class="buscar">
+                <input type="text" id="input-busca" placeholder="Buscar...">
+            </div>
+        </div>
+    </header>
+    <main class="container">
+        <h2>Bem-vindo à Página Segura!</h2>
+        <p>Esta é uma página segura. Seu login foi bem-sucedido!</p>
+        <div class="card" id="listar-clinica"></div>
     </main>
 </body>
-</html>

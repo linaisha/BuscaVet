@@ -2,28 +2,33 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Página Segura 2</title>
+    <title>Página de Perfil</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
-
-<body style="background-image: url('../img/BuscaVetLogo.png');">
-        <header class="cabecalho">
-            <div class="juntos">
-                <div class="logo">
-                  <a href="index.html">
-                    <img src="../img/Logo.png" width="120" height="120">
-                  </a>
-        
-        <a href="../php/verifica_sessao_usuario.php" class="link">Ir para Página</a>
-        <a href="../php/logout_usuario.php" class="link">Sair </a>
-                </div>
-            </div>
-        </header>
+<body>
+    <header class="cabecalho">
+        <h2>Bem-vindo ao seu Perfil!</h2>
+    </header>
     <main>
-        <h2 id="titulo_geral"> Bem Vindo à Página Segura 2!</h2>
-        <h2 id="titulo_geral">Esta é uma página segura. Seu login foi bem-sucedido!</h2>
-        <body style="background-image: url('../img/BuscaVetLogo.png');">
-        </body>
+        <p>Edite suas informações pessoais abaixo:</p>
+        <form id="form-perfil" action="../php/atualizar_perfil_usuario.php" method="post">
+            <div class="input-container">
+                <label for="name">Nome</label>
+                <input type="text" name="name" id="name" required>
+            </div>
+            <div class="input-container">
+                <label for="email">E-mail</label>
+                <input type="email" name="email" id="email" required>
+            </div>
+            <div class="input-container">
+                <label for="phone">Telefone</label>
+                <input type="tel" name="phone" id="phone" required>
+            </div>
+            <button type="submit">Atualizar</button>
+        </form>
+        <p><a href="../php/verifica_sessao_usuario.php">Voltar para Página Segura</a></p>
+        <p><a href="../php/logout_usuario.php">Sair</a></p>
     </main>
+    <script src="../js/perfil_usuario.js"></script>
 </body>
 </html>

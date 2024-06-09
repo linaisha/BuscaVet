@@ -36,14 +36,22 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $conn->real_escape_string($_POST['name']);
-    $login = $conn->real_escape_string($_POST['login']);
-    $email = $conn->real_escape_string($_POST['email']);
-    $especializacao = $conn->real_escape_string($_POST['especializacao']);
-    $endereco = $conn->real_escape_string($_POST['endereco']);
-    $crmv = $conn->real_escape_string($_POST['crmv']);
-    $password = $_POST['password'];
-    $phone = $conn->real_escape_string($_POST['phone']);
+    $privateKeyPath = '/caminho/para/o/seu/private_key.pem';
+    $privateKey = file_get_contents($privateKeyPath);
+
+    $encryptedData = file_get_contents('php://input');
+    openssl_private_decrypt(base64_decode($encryptedData), $decryptedData, openssl_pkey_get_private($privateKey));
+
+    $data = json_decode($decryptedData, true);
+
+    $name = $conn->real_escape_string($data['name']);
+    $login = $conn->real_escape_string($data['login']);
+    $email = $conn->real_escape_string($data['email']);
+    $especializacao = $conn->real_escape_string($data['especializacao']);
+    $endereco = $conn->real_escape_string($data['endereco']);
+    $crmv = $conn->real_escape_string($data['crmv']);
+    $password = $data['password'];
+    $phone = $conn->real_escape_string($data['phone']);
 
     if (!validarEmail($email) || !validarSenha($password) || !validarCRMV($crmv)) {
         echo json_encode(['success' => false, 'message' => 'Validação falhou']);

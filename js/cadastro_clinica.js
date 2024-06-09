@@ -2,8 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const clinicaForm = document.getElementById("form-cadastro-clinica");
 
   function validarSenha(senha) {
-    const senhaRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const senhaRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return senhaRegex.test(senha);
   }
 
@@ -34,7 +33,17 @@ document.addEventListener("DOMContentLoaded", function () {
     e.target.value = input;
   });
 
-  clinicaForm.addEventListener("submit", function (event) {
+  async function getPublicKeyFromCertificate() {
+    const response = await fetch("../php/get_certificate.php");
+    const data = await response.json();
+    const certificate = data.certificate;
+    const cert = new X509();
+    cert.readCertPEM(certificate);
+    const publicKey = cert.getPublicKey();
+    return KEYUTIL.getKey(publicKey);
+  }
+
+  clinicaForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const name = document.getElementById("name").value;
@@ -57,10 +66,30 @@ document.addEventListener("DOMContentLoaded", function () {
     else if (password !== check_password) alert("As senhas não coincidem.");
     else {
       const formData = new FormData(clinicaForm);
+      const publicKey = await getPublicKeyFromCertificate();
+
+      const data = {
+        name: formData.get("name"),
+        login: formData.get("login"),
+        crmv: formData.get("crmv"),
+        email: formData.get("email"),
+        endereco: formData.get("endereco"),
+        especializacao: formData.get("especializacao"),
+        password: formData.get("password"),
+        phone: formData.get("phone"),
+      };
+
+      const encryptedData = await window.crypto.subtle.encrypt(
+        {
+          name: "RSA-OAEP",
+        },
+        publicKey,
+        new TextEncoder().encode(JSON.stringify(data))
+      );
 
       fetch("../php/cadastro_clinica.php", {
         method: "POST",
-        body: formData,
+        body: encryptedData,
       })
         .then((response) => response.json())
         .then((data) => {

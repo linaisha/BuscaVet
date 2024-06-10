@@ -35,7 +35,6 @@ function validarCRMV($crmv)
 
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
-$privateKeyPassword = 'TotalmenteOnline#69';
 
 function log_error($message)
 {
@@ -65,7 +64,7 @@ try {
         throw new Exception('Erro ao ler o conteúdo da chave privada.');
     }
 
-    $privateKey = openssl_pkey_get_private($privateKeyContent, $privateKeyPassword);
+    $privateKey = openssl_pkey_get_private($privateKeyContent);
 
     if (!$privateKey) {
         $error = openssl_error_string();

@@ -10,10 +10,12 @@ header('Content-Type: application/json');
 
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
+$logFilePath = realpath(dirname(__FILE__) . '/../logs/php-error.log');
 
 function log_error($message)
 {
-    error_log($message, 3, '../logs/php-error.log');
+    global $logFilePath;
+    error_log($message, 3, $logFilePath);
 }
 
 function return_json_error($message)
@@ -104,9 +106,9 @@ try {
             $updateStmt->close();
 
             require_once '../twilio/vendor/autoload.php';
-            $twilioSid = 'AC986807cad58fd6a8134f2a3f8c80a9c7';
-            $twilioToken = '38c444a3f2399d7a98794f627becf25b';
-            $twilioPhoneNumber = '14793485734';
+            $twilioSid = 'AC6fdfece6c25c3b5788e700f63e2f6c2f';
+            $twilioToken = '0b1ee83dccf90fcea079401ece7234a6';
+            $twilioPhoneNumber = '15306841566';
 
             $client = new Twilio\Rest\Client($twilioSid, $twilioToken);
 
@@ -139,5 +141,4 @@ try {
 }
 
 ob_end_flush();
-
 ?>

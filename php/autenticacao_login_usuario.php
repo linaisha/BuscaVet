@@ -10,7 +10,7 @@ header('Content-Type: application/json');
 
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
-$privateKeyPassword = 'TotalmenteOnline#69';
+
 
 function log_error($message)
 {
@@ -40,7 +40,7 @@ try {
         throw new Exception('Erro ao ler o conteúdo da chave privada.');
     }
 
-    $privateKey = openssl_pkey_get_private($privateKeyContent, $privateKeyPassword);
+    $privateKey = openssl_pkey_get_private($privateKeyContent);
 
     if (!$privateKey) {
         $error = openssl_error_string();
@@ -105,9 +105,9 @@ try {
             $updateStmt->close();
 
             require_once '../twilio/vendor/autoload.php';
-            $twilioSid = 'AC986807cad58fd6a8134f2a3f8c80a9c7';
-            $twilioToken = '38c444a3f2399d7a98794f627becf25b';
-            $twilioPhoneNumber = '14793485734';
+            $twilioSid = 'AC6fdfece6c25c3b5788e700f63e2f6c2f';
+            $twilioToken = '0b1ee83dccf90fcea079401ece7234a6';
+            $twilioPhoneNumber = '15306841566';
 
             $client = new Twilio\Rest\Client($twilioSid, $twilioToken);
 

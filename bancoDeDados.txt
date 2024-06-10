@@ -1,0 +1,36 @@
+CREATE DATABASE IF NOT EXISTS buscavet;
+USE buscavet;
+
+CREATE TABLE IF NOT EXISTS usuario (
+  id INT(11) AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  login VARCHAR(50) NOT NULL UNIQUE,
+  email VARCHAR(70) NOT NULL UNIQUE,
+  cpf VARCHAR(14) NOT NULL UNIQUE,
+  password VARCHAR(200) NOT NULL,
+  data_nasc DATE NOT NULL,
+  confirmacao TINYINT(1) NOT NULL,
+  token VARCHAR(255),
+  token_expira DATETIME,
+  codigo_verificacao VARCHAR(6),
+  codigo_verificacao_expira DATETIME,
+  phone VARCHAR(20)
+);
+
+CREATE TABLE IF NOT EXISTS clinica (
+  id INT(11) AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  login VARCHAR(50) NOT NULL UNIQUE,
+  endereco VARCHAR(150) NOT NULL,
+  email VARCHAR(40) NOT NULL UNIQUE,
+  especializacao ENUM('peixes', 'anfibios', 'repteis', 'aves', 'mamiferos') NOT NULL,
+  crmv VARCHAR(10) NOT NULL UNIQUE,
+  password VARCHAR(200) NOT NULL,
+  confirmacao TINYINT(1) NOT NULL,
+  token_expira DATETIME,
+  token VARCHAR(255),
+  codigo_verificacao VARCHAR(6),
+  codigo_verificacao_expira DATETIME,
+  phone VARCHAR(20)
+);
+

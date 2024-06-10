@@ -67,21 +67,41 @@ document.addEventListener("DOMContentLoaded", function () {
           return response.text();
         })
         .then((publicKey) => {
-          console.log("Chave pública carregada: " + publicKey);
-
           const encrypt = new JSEncrypt();
           encrypt.setPublicKey(publicKey);
 
+          const encryptedName = encrypt.encrypt(name);
+          const encryptedLogin = encrypt.encrypt(login);
+          const encryptedCRMV = encrypt.encrypt(crmv);
+          const encryptedEmail = encrypt.encrypt(email);
+          const encryptedEndereco = encrypt.encrypt(endereco);
+          const encryptedEspecializacao = encrypt.encrypt(especializacao);
           const encryptedPassword = encrypt.encrypt(password);
-          console.log("Senha criptografada: " + encryptedPassword);
+          const encryptedPhone = encrypt.encrypt(phone);
 
-          if (!encryptedPassword) {
-            alert("Erro ao criptografar a senha.");
+          if (
+            !encryptedName ||
+            !encryptedLogin ||
+            !encryptedCRMV ||
+            !encryptedEmail ||
+            !encryptedEndereco ||
+            !encryptedEspecializacao ||
+            !encryptedPassword ||
+            !encryptedPhone
+          ) {
+            alert("Erro ao criptografar os dados.");
             return;
           }
 
-          const formData = new FormData(clinicaForm);
-          formData.set("password", encryptedPassword);
+          const formData = new FormData();
+          formData.append("name", encryptedName);
+          formData.append("login", encryptedLogin);
+          formData.append("crmv", encryptedCRMV);
+          formData.append("email", encryptedEmail);
+          formData.append("endereco", encryptedEndereco);
+          formData.append("especializacao", encryptedEspecializacao);
+          formData.append("password", encryptedPassword);
+          formData.append("phone", encryptedPhone);
 
           fetch("../php/cadastro_clinica.php", {
             method: "POST",

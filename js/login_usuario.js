@@ -15,21 +15,19 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.text();
       })
       .then((publicKey) => {
-        console.log("Chave pública carregada: " + publicKey);
-
         const encrypt = new JSEncrypt();
         encrypt.setPublicKey(publicKey);
 
+        const encryptedEmail = encrypt.encrypt(email);
         const encryptedPassword = encrypt.encrypt(password);
-        console.log("Senha criptografada: " + encryptedPassword);
 
-        if (!encryptedPassword) {
-          alert("Erro ao criptografar a senha.");
+        if (!encryptedEmail || !encryptedPassword) {
+          alert("Erro ao criptografar os dados.");
           return;
         }
 
         const formData = new FormData();
-        formData.append("email", email);
+        formData.append("email", encryptedEmail);
         formData.append("password", encryptedPassword);
 
         fetch("../php/autenticacao_login_usuario.php", {

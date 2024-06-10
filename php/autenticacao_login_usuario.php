@@ -8,18 +8,15 @@ error_reporting(0);
 session_start();
 header('Content-Type: application/json');
 
-// Configurações do caminho para os arquivos de certificado e chave privada
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
-$privateKeyPassword = 'TotalmenteOnline#69'; // Senha da chave privada
+$privateKeyPassword = 'TotalmenteOnline#69';
 
-// Função para registrar erros
 function log_error($message)
 {
     error_log($message, 3, '../logs/php-error.log');
 }
 
-// Função para retornar erros como JSON
 function return_json_error($message)
 {
     echo json_encode(['success' => false, 'message' => $message]);
@@ -28,7 +25,6 @@ function return_json_error($message)
 }
 
 try {
-    // Verificar se os arquivos existem
     if (!file_exists($certPath)) {
         throw new Exception('Certificado não encontrado no caminho especificado: ' . $certPath);
     }
@@ -37,7 +33,6 @@ try {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
 
-    // Leitura do certificado e da chave privada
     $publicKey = file_get_contents($certPath);
     $privateKeyContent = file_get_contents($privateKeyPath);
 
@@ -52,28 +47,30 @@ try {
         throw new Exception('Falha ao carregar a chave privada. Erro: ' . $error);
     }
 
-    // Conectar ao banco de dados
+    $encryptedEmail = $_POST['email'] ?? '';
+    $encryptedPassword = $_POST['password'] ?? '';
+
+    if (empty($encryptedEmail) || empty($encryptedPassword)) {
+        throw new Exception('Email e senha são obrigatórios.');
+    }
+
+    $email = '';
+    $decryptedPassword = '';
+
+    if (!openssl_private_decrypt(base64_decode($encryptedEmail), $email, $privateKey)) {
+        throw new Exception('Erro ao decriptar o email.');
+    }
+
+    if (!openssl_private_decrypt(base64_decode($encryptedPassword), $decryptedPassword, $privateKey)) {
+        throw new Exception('Erro ao decriptar a senha.');
+    }
+
     $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
     if ($conn->connect_error) {
         throw new Exception('Falha na conexão: ' . $conn->connect_error);
     }
 
-    // Receber os dados do formulário
-    $email = isset($_POST['email']) ? $conn->real_escape_string($_POST['email']) : '';
-    $encryptedPassword = isset($_POST['password']) ? $_POST['password'] : '';
-
-    if (empty($email) || empty($encryptedPassword)) {
-        throw new Exception('Email e senha são obrigatórios.');
-    }
-
-    // Decriptar a senha recebida
-    $decryptedPassword = '';
-    if (!openssl_private_decrypt(base64_decode($encryptedPassword), $decryptedPassword, $privateKey)) {
-        throw new Exception('Erro ao decriptar a senha.');
-    }
-
-    // Consultar o usuário no banco de dados
     $query = "SELECT id, name, email, password, confirmacao, phone FROM usuario WHERE email = ?";
     $stmt = $conn->prepare($query);
 
@@ -96,7 +93,6 @@ try {
             exit;
         }
 
-        // Verificar a senha descriptografada com o hash armazenado
         if (password_verify($decryptedPassword, $user['password'])) {
             $_SESSION['login_user_id'] = $user['id'];
             $_SESSION['login_user_email'] = $user['email'];
@@ -144,4 +140,5 @@ try {
 }
 
 ob_end_flush();
+
 ?>

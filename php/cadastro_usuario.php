@@ -2,8 +2,8 @@
 include 'decode_cred.php';
 
 ob_start();
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 require '../PHPMailer/src/Exception.php';
 require '../PHPMailer/src/PHPMailer.php';
@@ -14,18 +14,15 @@ use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
-// Configurações do caminho para os arquivos de certificado e chave privada
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
-$privateKeyPassword = 'TotalmenteOnline#69'; // Senha da chave privada
+$privateKeyPassword = 'TotalmenteOnline#69';
 
-// Função para registrar erros
 function log_error($message)
 {
     error_log($message, 3, '../logs/php-error.log');
 }
 
-// Função para retornar erros como JSON
 function return_json_error($message)
 {
     echo json_encode(['success' => false, 'message' => $message]);
@@ -84,7 +81,6 @@ function enviarEmailConfirmacao($email, $token)
 }
 
 try {
-    // Verificar se os arquivos existem
     if (!file_exists($certPath)) {
         throw new Exception('Certificado não encontrado no caminho especificado: ' . $certPath);
     }
@@ -93,7 +89,6 @@ try {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
 
-    // Leitura do certificado e da chave privada
     $publicKey = file_get_contents($certPath);
     $privateKeyContent = file_get_contents($privateKeyPath);
 
@@ -111,13 +106,43 @@ try {
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
         if ($conn) {
-            $name = $conn->real_escape_string($_POST['name']);
-            $login = $conn->real_escape_string($_POST['login']);
-            $email = $conn->real_escape_string($_POST['email']);
-            $cpf = $conn->real_escape_string($_POST['cpf']);
-            $data_nasc = $conn->real_escape_string($_POST['data_nasc']);
+            $encryptedName = $_POST['name'];
+            $encryptedLogin = $_POST['login'];
+            $encryptedEmail = $_POST['email'];
+            $encryptedCpf = $_POST['cpf'];
+            $encryptedDataNasc = $_POST['data_nasc'];
             $encryptedPassword = $_POST['password'];
-            $phone = $conn->real_escape_string($_POST['phone']);
+            $encryptedPhone = $_POST['phone'];
+
+            $name = '';
+            $login = '';
+            $email = '';
+            $cpf = '';
+            $data_nasc = '';
+            $password = '';
+            $phone = '';
+
+            if (!openssl_private_decrypt(base64_decode($encryptedName), $name, $privateKey)) {
+                throw new Exception('Erro ao decriptar o nome.');
+            }
+            if (!openssl_private_decrypt(base64_decode($encryptedLogin), $login, $privateKey)) {
+                throw new Exception('Erro ao decriptar o login.');
+            }
+            if (!openssl_private_decrypt(base64_decode($encryptedEmail), $email, $privateKey)) {
+                throw new Exception('Erro ao decriptar o email.');
+            }
+            if (!openssl_private_decrypt(base64_decode($encryptedCpf), $cpf, $privateKey)) {
+                throw new Exception('Erro ao decriptar o CPF.');
+            }
+            if (!openssl_private_decrypt(base64_decode($encryptedDataNasc), $data_nasc, $privateKey)) {
+                throw new Exception('Erro ao decriptar a data de nascimento.');
+            }
+            if (!openssl_private_decrypt(base64_decode($encryptedPassword), $password, $privateKey)) {
+                throw new Exception('Erro ao decriptar a senha.');
+            }
+            if (!openssl_private_decrypt(base64_decode($encryptedPhone), $phone, $privateKey)) {
+                throw new Exception('Erro ao decriptar o telefone.');
+            }
 
             if (!validarEmail($email)) {
                 echo json_encode(['success' => false, 'message' => 'E-mail inválido.']);
@@ -134,22 +159,16 @@ try {
                 exit;
             }
 
-            if (empty($encryptedPassword)) {
+            if (empty($password)) {
                 throw new Exception('Senha é obrigatória.');
             }
 
-            // Decriptar a senha recebida
-            $decryptedPassword = '';
-            if (!openssl_private_decrypt(base64_decode($encryptedPassword), $decryptedPassword, $privateKey)) {
-                throw new Exception('Erro ao decriptar a senha.');
-            }
-
-            if (!validarSenha($decryptedPassword)) {
+            if (!validarSenha($password)) {
                 echo json_encode(['success' => false, 'message' => 'A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial.']);
                 exit;
             }
 
-            $hashedPassword = password_hash($decryptedPassword, PASSWORD_DEFAULT);
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
             $stmt = $conn->prepare("INSERT INTO usuario (name, login, email, data_nasc, cpf, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmt->bind_param('sssssss', $name, $login, $email, $data_nasc, $cpf, $hashedPassword, $phone);

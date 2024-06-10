@@ -33,18 +33,15 @@ function validarCRMV($crmv)
     return preg_match($regex, $crmv);
 }
 
-// Configurações do caminho para os arquivos de certificado e chave privada
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
-$privateKeyPassword = 'TotalmenteOnline#69'; // Senha da chave privada
+$privateKeyPassword = 'TotalmenteOnline#69';
 
-// Função para registrar erros
 function log_error($message)
 {
     error_log($message, 3, '../logs/php-error.log');
 }
 
-// Função para retornar erros como JSON
 function return_json_error($message)
 {
     echo json_encode(['success' => false, 'message' => $message]);
@@ -53,7 +50,6 @@ function return_json_error($message)
 }
 
 try {
-    // Verificar se os arquivos existem
     if (!file_exists($certPath)) {
         throw new Exception('Certificado não encontrado no caminho especificado: ' . $certPath);
     }
@@ -62,7 +58,6 @@ try {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
 
-    // Leitura do certificado e da chave privada
     $publicKey = file_get_contents($certPath);
     $privateKeyContent = file_get_contents($privateKeyPath);
 
@@ -77,7 +72,6 @@ try {
         throw new Exception('Falha ao carregar a chave privada. Erro: ' . $error);
     }
 
-    // Conexão ao banco de dados
     $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
     if ($conn->connect_error) {
@@ -85,32 +79,42 @@ try {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $name = $conn->real_escape_string($_POST['name']);
-        $login = $conn->real_escape_string($_POST['login']);
-        $email = $conn->real_escape_string($_POST['email']);
-        $especializacao = $conn->real_escape_string($_POST['especializacao']);
-        $endereco = $conn->real_escape_string($_POST['endereco']);
-        $crmv = $conn->real_escape_string($_POST['crmv']);
-        $encryptedPassword = $_POST['password'];
-        $phone = $conn->real_escape_string($_POST['phone']);
-
-        if (!validarEmail($email) || !validarCRMV($crmv)) {
-            echo json_encode(['success' => false, 'message' => 'Validação falhou']);
-            exit;
-        }
-
-        if (empty($encryptedPassword)) {
-            throw new Exception('Senha é obrigatória.');
-        }
-
-        // Decriptar a senha recebida
+        $name = '';
+        $login = '';
+        $crmv = '';
+        $email = '';
+        $endereco = '';
+        $especializacao = '';
+        $phone = '';
         $decryptedPassword = '';
-        if (!openssl_private_decrypt(base64_decode($encryptedPassword), $decryptedPassword, $privateKey)) {
+
+        if (!openssl_private_decrypt(base64_decode($_POST['name']), $name, $privateKey)) {
+            throw new Exception('Erro ao decriptar o nome.');
+        }
+        if (!openssl_private_decrypt(base64_decode($_POST['login']), $login, $privateKey)) {
+            throw new Exception('Erro ao decriptar o login.');
+        }
+        if (!openssl_private_decrypt(base64_decode($_POST['crmv']), $crmv, $privateKey)) {
+            throw new Exception('Erro ao decriptar o CRMV.');
+        }
+        if (!openssl_private_decrypt(base64_decode($_POST['email']), $email, $privateKey)) {
+            throw new Exception('Erro ao decriptar o email.');
+        }
+        if (!openssl_private_decrypt(base64_decode($_POST['endereco']), $endereco, $privateKey)) {
+            throw new Exception('Erro ao decriptar o endereço.');
+        }
+        if (!openssl_private_decrypt(base64_decode($_POST['especializacao']), $especializacao, $privateKey)) {
+            throw new Exception('Erro ao decriptar a especialização.');
+        }
+        if (!openssl_private_decrypt(base64_decode($_POST['phone']), $phone, $privateKey)) {
+            throw new Exception('Erro ao decriptar o telefone.');
+        }
+        if (!openssl_private_decrypt(base64_decode($_POST['password']), $decryptedPassword, $privateKey)) {
             throw new Exception('Erro ao decriptar a senha.');
         }
 
-        if (!validarSenha($decryptedPassword)) {
-            echo json_encode(['success' => false, 'message' => 'A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial.']);
+        if (!validarEmail($email) || !validarCRMV($crmv) || !validarSenha($decryptedPassword)) {
+            echo json_encode(['success' => false, 'message' => 'Validação falhou']);
             exit;
         }
 

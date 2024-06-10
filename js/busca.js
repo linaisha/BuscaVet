@@ -9,12 +9,41 @@ document.addEventListener("DOMContentLoaded", function () {
   function buscarClinicas() {
     const termoBusca = inputBusca.value;
 
-    fetch(`../php/listar_clinicas.php?termo=${termoBusca}`)
-      .then((response) => response.json())
-      .then((clinicas) => {
-        atualizarListaClinicas(clinicas);
+    fetch("../chaves/public_key.pem")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erro ao carregar a chave pública.");
+        }
+        return response.text();
       })
-      .catch((error) => console.error(error));
+      .then((publicKey) => {
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(publicKey);
+
+        const encryptedTermoBusca = encrypt.encrypt(termoBusca);
+
+        if (!encryptedTermoBusca) {
+          alert("Erro ao criptografar o termo de busca.");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("termo", encryptedTermoBusca);
+
+        fetch("../php/listar_clinicas.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((clinicas) => {
+            atualizarListaClinicas(clinicas);
+          })
+          .catch((error) => console.error(error));
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar a chave pública: ", error);
+        alert("Erro ao carregar a chave pública.");
+      });
   }
 
   function atualizarListaClinicas(clinicas) {

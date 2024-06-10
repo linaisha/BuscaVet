@@ -99,7 +99,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
-        // SHA-256 Hashing
         $passwordHashed = hash('sha256', $password);
         $stmt = $conn->prepare("INSERT INTO usuario (name, login, email, data_nasc, cpf, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?)");
         mysqli_stmt_bind_param($stmt, 'sssssss', $name, $login, $email, $data_nasc, $cpf, $passwordHashed, $phone);

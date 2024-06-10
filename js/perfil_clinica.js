@@ -23,25 +23,70 @@ document.addEventListener("DOMContentLoaded", function () {
   formPerfilClinica.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    const formData = new FormData(formPerfilClinica);
+    const name = document.getElementById("name").value;
+    const especializacao = document.getElementById("especializacao").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const endereco = document.getElementById("endereco").value;
 
-    fetch("../php/atualizar_perfil_clinica.php", {
-      method: "POST",
-      body: formData,
-    })
+    fetch("../chaves/public_key.pem")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Erro na resposta da rede");
+          throw new Error("Erro ao carregar a chave pública.");
         }
-        return response.json();
+        return response.text();
       })
-      .then((data) => {
-        if (data.success) {
-          alert("Perfil atualizado com sucesso!");
-        } else {
-          alert("Erro ao atualizar perfil: " + data.message);
+      .then((publicKey) => {
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(publicKey);
+
+        const encryptedData = {
+          name: encrypt.encrypt(name),
+          especializacao: encrypt.encrypt(especializacao),
+          email: encrypt.encrypt(email),
+          phone: encrypt.encrypt(phone),
+          endereco: encrypt.encrypt(endereco),
+        };
+
+        if (
+          !encryptedData.name ||
+          !encryptedData.especializacao ||
+          !encryptedData.email ||
+          !encryptedData.phone ||
+          !encryptedData.endereco
+        ) {
+          alert("Erro ao criptografar os dados.");
+          return;
         }
+
+        const formData = new FormData();
+        formData.append("name", encryptedData.name);
+        formData.append("especializacao", encryptedData.especializacao);
+        formData.append("email", encryptedData.email);
+        formData.append("phone", encryptedData.phone);
+        formData.append("endereco", encryptedData.endereco);
+
+        fetch("../php/atualizar_perfil_clinica.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Erro na resposta do servidor.");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            alert(data.message);
+          })
+          .catch((error) => {
+            console.error("Erro na requisição: ", error);
+            alert("Erro ao atualizar perfil: " + error.message);
+          });
       })
-      .catch((error) => console.error("Erro ao atualizar perfil:", error));
+      .catch((error) => {
+        console.error("Erro ao carregar a chave pública: ", error);
+        alert("Erro ao carregar a chave pública.");
+      });
   });
 });

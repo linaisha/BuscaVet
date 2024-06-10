@@ -18,7 +18,7 @@ if ($conn->connect_error) {
     exit;
 }
 
-$sql = "SELECT name, especializacao, email, phone FROM clinica WHERE id = ?";
+$sql = "SELECT name, especializacao, email, phone, endereco FROM clinica WHERE id = ?";
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
     echo json_encode(['success' => false, 'message' => 'Erro ao preparar a query: ' . $conn->error]);
@@ -31,7 +31,18 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $clinica = $result->fetch_assoc();
-    echo json_encode(['success' => true, 'data' => $clinica]);
+
+    $certPath = '../chaves/certificate.pem';
+    $publicKey = file_get_contents($certPath);
+    $encrypt = new JSEncrypt();
+    $encrypt->setPublicKey($publicKey);
+
+    $encryptedClinica = [];
+    foreach ($clinica as $key => $value) {
+        $encryptedClinica[$key] = base64_encode($encrypt->encrypt($value));
+    }
+
+    echo json_encode(['success' => true, 'data' => $encryptedClinica]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Clínica não encontrada']);
 }

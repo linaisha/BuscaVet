@@ -28,12 +28,10 @@ if (empty($_POST['verification_code'])) {
     return_json_error('Código de verificação é necessário.');
 }
 
-// Caminho para os arquivos de certificado e chave privada
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
 
 try {
-    // Verificar se os arquivos existem
     if (!file_exists($certPath)) {
         throw new Exception('Certificado não encontrado no caminho especificado: ' . $certPath);
     }
@@ -42,7 +40,6 @@ try {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
 
-    // Leitura do certificado e da chave privada
     $publicKey = file_get_contents($certPath);
     $privateKeyContent = file_get_contents($privateKeyPath);
 
@@ -57,7 +54,14 @@ try {
         throw new Exception('Falha ao carregar a chave privada. Erro: ' . $error);
     }
 
-    $verificationCode = $_POST['verification_code'];
+    $encryptedCode = $_POST['verification_code'];
+
+    $verificationCode = '';
+
+    if (!openssl_private_decrypt(base64_decode($encryptedCode), $verificationCode, $privateKey)) {
+        throw new Exception('Erro ao decriptar o código de verificação.');
+    }
+
     $clinicId = $_SESSION['clinica_id'] ?? '';
 
     if (empty($clinicId)) {

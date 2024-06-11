@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault();
     const code = document.getElementById("verification-code").value.trim();
 
+    console.log("Tentando carregar a chave pública...");
+
     fetch("../chaves/public_key.pem")
       .then((response) => {
         if (!response.ok) {
@@ -13,12 +15,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.text();
       })
       .then((publicKey) => {
-        //console.log("Chave pública carregada: ", publicKey);
         const encrypt = new JSEncrypt();
         encrypt.setPublicKey(publicKey);
 
         const encryptedCode = encrypt.encrypt(code);
-        //console.log("Código criptografado: ", encryptedCode);
 
         if (!encryptedCode) {
           alert("Erro ao criptografar o código.");
@@ -43,9 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
           })
           .catch((error) => {
             console.error("Erro na verificação: ", error);
-            alert(
-              "Erro ao processar a verificação. Por favor, tente novamente."
-            );
+            alert("Erro ao processar a verificação. Por favor, tente novamente.");
           });
       })
       .catch((error) => {

@@ -88,7 +88,6 @@ try {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
 
-    $publicKey = file_get_contents($certPath);
     $privateKeyContent = file_get_contents($privateKeyPath);
 
     if ($privateKeyContent === false) {
@@ -173,28 +172,31 @@ try {
             $stmt->bind_param('sssssss', $name, $login, $email, $data_nasc, $cpf, $hashedPassword, $phone);
 
             if ($stmt->execute()) {
-                $token = bin2hex(random_bytes(50));
-                $updateTokenStmt = $conn->prepare("UPDATE usuario SET token = ? WHERE email = ?");
-                $updateTokenStmt->bind_param('ss', $token, $email);
-                $updateTokenStmt->execute();
-                $updateTokenStmt->close();
+                $token = bin2hex(random_bytes(16));
+                $expira = date("Y-m-d H:i:s", strtotime('+1 day'));
+
+                $stmtUpdate = $conn->prepare("UPDATE usuario SET token = ?, token_expira = ? WHERE email = ?");
+                $stmtUpdate->bind_param("sss", $token, $expira, $email);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
 
                 if (enviarEmailConfirmacao($email, $token)) {
-                    echo json_encode(["mensagem" => "Usuário cadastrado com sucesso! E-mail de confirmação enviado."]);
+                    echo json_encode(['success' => true, 'message' => 'Usuário cadastrado com sucesso. Por favor, verifique seu e-mail para confirmar o cadastro.']);
                 } else {
-                    echo json_encode(["mensagem" => "Usuário cadastrado. Erro ao enviar e-mail de confirmação."]);
+                    echo json_encode(['success' => false, 'message' => 'Usuário cadastrado, mas houve um erro ao enviar o e-mail de confirmação.']);
                 }
             } else {
-                echo json_encode(["mensagem" => "Erro ao cadastrar o usuário: " . $stmt->error]);
+                echo json_encode(['success' => false, 'message' => 'Erro ao cadastrar o usuário.']);
             }
 
             $stmt->close();
-            $conn->close();
         } else {
-            echo json_encode(["mensagem" => "Erro na conexão com o banco de dados: " . $conn->connect_error]);
+            throw new Exception('Erro ao conectar ao banco de dados.');
         }
+
+        $conn->close();
     } else {
-        echo json_encode(["mensagem" => "Método de requisição inválido."]);
+        echo json_encode(['success' => false, 'message' => 'Método de requisição inválido.']);
     }
 } catch (Exception $e) {
     log_error($e->getMessage());

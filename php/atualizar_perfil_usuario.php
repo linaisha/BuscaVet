@@ -7,7 +7,6 @@ header('Content-Type: application/json');
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
 
-
 function log_error($message)
 {
     error_log($message, 3, '../logs/php-error.log');
@@ -42,11 +41,11 @@ try {
         throw new Exception('Falha ao carregar a chave privada. Erro: ' . $error);
     }
 
-    if (!isset($_SESSION['user_id'])) {
+    if (!isset($_SESSION['usuario_id'])) {
         throw new Exception('Usuário não autenticado');
     }
 
-    $user_id = $_SESSION['user_id'];
+    $usuario_id = $_SESSION['usuario_id'];
 
     $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
@@ -57,10 +56,12 @@ try {
     $encryptedName = $_POST['name'];
     $encryptedEmail = $_POST['email'];
     $encryptedPhone = $_POST['phone'];
+    $encryptedDataNasc = $_POST['data_nasc'];
 
     $name = '';
     $email = '';
     $phone = '';
+    $data_nasc = '';
 
     if (!openssl_private_decrypt(base64_decode($encryptedName), $name, $privateKey)) {
         throw new Exception('Erro ao decriptar o nome.');
@@ -74,13 +75,17 @@ try {
         throw new Exception('Erro ao decriptar o telefone.');
     }
 
-    $sql = "UPDATE usuario SET name = ?, email = ?, phone = ? WHERE id = ?";
+    if (!openssl_private_decrypt(base64_decode($encryptedDataNasc), $data_nasc, $privateKey)) {
+        throw new Exception('Erro ao decriptar a data de nascimento.');
+    }
+
+    $sql = "UPDATE usuario SET name = ?, email = ?, phone = ?, data_nasc = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
         throw new Exception('Erro ao preparar a query: ' . $conn->error);
     }
 
-    $stmt->bind_param("sssi", $name, $email, $phone, $user_id);
+    $stmt->bind_param("ssssi", $name, $email, $phone, $data_nasc, $usuario_id);
 
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Perfil atualizado com sucesso']);

@@ -1,27 +1,18 @@
 <?php
 include 'decode_cred.php';
 
-ob_start();
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 header('Content-Type: application/json');
 
 $certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
-$logFilePath = realpath(dirname(__FILE__) . '/../logs/php-error.log');
 
-function log_error($message)
-{
-    global $logFilePath;
-    error_log($message, 3, $logFilePath);
+function log_error($message) {
+    error_log($message, 3, '../logs/php-error.log');
 }
 
-function return_json_error($message)
-{
+function return_json_error($message) {
     echo json_encode(['success' => false, 'message' => $message]);
-    ob_end_flush();
     exit;
 }
 
@@ -34,7 +25,6 @@ try {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
 
-    $publicKey = file_get_contents($certPath);
     $privateKeyContent = file_get_contents($privateKeyPath);
 
     if ($privateKeyContent === false) {
@@ -48,8 +38,8 @@ try {
         throw new Exception('Falha ao carregar a chave privada. Erro: ' . $error);
     }
 
-    $encryptedEmail = $_POST['email'] ?? '';
-    $encryptedPassword = $_POST['password'] ?? '';
+    $encryptedEmail = $_POST['encrypted_email'] ?? '';
+    $encryptedPassword = $_POST['encrypted_password'] ?? '';
 
     if (empty($encryptedEmail) || empty($encryptedPassword)) {
         throw new Exception('Email e senha são obrigatórios.');
@@ -90,7 +80,6 @@ try {
             echo json_encode(['success' => false, 'message' => 'Conta não confirmada. Por favor, verifique seu e-mail.']);
             $stmt->close();
             $conn->close();
-            ob_end_flush();
             exit;
         }
 
@@ -121,7 +110,7 @@ try {
                     ]
                 );
 
-                echo json_encode(['success' => true, 'message' => 'Login bem-sucedido e SMS enviado.', 'redirect' => '../html/pagina_inicial.html']);
+                echo json_encode(['success' => true, 'message' => 'Login bem-sucedido e SMS enviado.', 'redirect' => '../html/verificar_codigo_clinica.html']);
             } catch (Exception $e) {
                 log_error('Erro ao enviar código de verificação: ' . $e->getMessage());
                 echo json_encode(['success' => false, 'message' => 'Erro ao enviar código de verificação: ' . $e->getMessage()]);
@@ -137,8 +126,6 @@ try {
     $conn->close();
 } catch (Exception $e) {
     log_error($e->getMessage());
-    return_json_error($e->getMessage());
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
-
-ob_end_flush();
 ?>

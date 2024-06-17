@@ -45,7 +45,7 @@ function enviarEmailConfirmacao($email, $token)
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
         $mail->Username = 'buscavetpucpr@gmail.com';
-        $mail->Password = 'sua senha aqui';
+        $mail->Password = 'emdy mihd aoeo pxut';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 

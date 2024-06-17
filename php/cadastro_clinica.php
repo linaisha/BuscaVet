@@ -15,6 +15,21 @@ use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
+$certPath = '../chaves/certificate.pem';
+$privateKeyPath = '../chaves/private_key.pem';
+
+function log_error($message)
+{
+    error_log($message, 3, '../logs/php-error.log');
+}
+
+function return_json_error($message)
+{
+    echo json_encode(['success' => false, 'message' => $message]);
+    ob_end_flush();
+    exit;
+}
+
 // Funções de validação
 function validarSenha($senha)
 {
@@ -31,21 +46,6 @@ function validarCRMV($crmv)
 {
     $regex = '/^[A-Z]{2}\/\d+$/';
     return preg_match($regex, $crmv);
-}
-
-$certPath = '../chaves/certificate.pem';
-$privateKeyPath = '../chaves/private_key.pem';
-
-function log_error($message)
-{
-    error_log($message, 3, '../logs/php-error.log');
-}
-
-function return_json_error($message)
-{
-    echo json_encode(['success' => false, 'message' => $message]);
-    ob_end_flush();
-    exit;
 }
 
 try {
@@ -78,46 +78,55 @@ try {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $encryptedName = $_POST['name'];
+        $encryptedLogin = $_POST['login'];
+        $encryptedCRMV = $_POST['crmv'];
+        $encryptedEmail = $_POST['email'];
+        $encryptedEndereco = $_POST['endereco'];
+        $encryptedEspecializacao = $_POST['especializacao'];
+        $encryptedPassword = $_POST['password'];
+        $encryptedPhone = $_POST['phone'];
+
         $name = '';
         $login = '';
         $crmv = '';
         $email = '';
         $endereco = '';
         $especializacao = '';
+        $password = '';
         $phone = '';
-        $decryptedPassword = '';
 
-        if (!openssl_private_decrypt(base64_decode($_POST['name']), $name, $privateKey)) {
+        if (!openssl_private_decrypt(base64_decode($encryptedName), $name, $privateKey)) {
             throw new Exception('Erro ao decriptar o nome.');
         }
-        if (!openssl_private_decrypt(base64_decode($_POST['login']), $login, $privateKey)) {
+        if (!openssl_private_decrypt(base64_decode($encryptedLogin), $login, $privateKey)) {
             throw new Exception('Erro ao decriptar o login.');
         }
-        if (!openssl_private_decrypt(base64_decode($_POST['crmv']), $crmv, $privateKey)) {
+        if (!openssl_private_decrypt(base64_decode($encryptedCRMV), $crmv, $privateKey)) {
             throw new Exception('Erro ao decriptar o CRMV.');
         }
-        if (!openssl_private_decrypt(base64_decode($_POST['email']), $email, $privateKey)) {
+        if (!openssl_private_decrypt(base64_decode($encryptedEmail), $email, $privateKey)) {
             throw new Exception('Erro ao decriptar o email.');
         }
-        if (!openssl_private_decrypt(base64_decode($_POST['endereco']), $endereco, $privateKey)) {
+        if (!openssl_private_decrypt(base64_decode($encryptedEndereco), $endereco, $privateKey)) {
             throw new Exception('Erro ao decriptar o endereço.');
         }
-        if (!openssl_private_decrypt(base64_decode($_POST['especializacao']), $especializacao, $privateKey)) {
+        if (!openssl_private_decrypt(base64_decode($encryptedEspecializacao), $especializacao, $privateKey)) {
             throw new Exception('Erro ao decriptar a especialização.');
         }
-        if (!openssl_private_decrypt(base64_decode($_POST['phone']), $phone, $privateKey)) {
-            throw new Exception('Erro ao decriptar o telefone.');
-        }
-        if (!openssl_private_decrypt(base64_decode($_POST['password']), $decryptedPassword, $privateKey)) {
+        if (!openssl_private_decrypt(base64_decode($encryptedPassword), $password, $privateKey)) {
             throw new Exception('Erro ao decriptar a senha.');
         }
+        if (!openssl_private_decrypt(base64_decode($encryptedPhone), $phone, $privateKey)) {
+            throw new Exception('Erro ao decriptar o telefone.');
+        }
 
-        if (!validarEmail($email) || !validarCRMV($crmv) || !validarSenha($decryptedPassword)) {
+        if (!validarEmail($email) || !validarCRMV($crmv) || !validarSenha($password)) {
             echo json_encode(['success' => false, 'message' => 'Validação falhou']);
             exit;
         }
 
-        $hashedPassword = password_hash($decryptedPassword, PASSWORD_DEFAULT);
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $stmt = $conn->prepare("INSERT INTO clinica (name, login, email, especializacao, endereco, crmv, password, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         if (!$stmt) {

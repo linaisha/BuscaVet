@@ -20,8 +20,8 @@ if ($conn->connect_error) {
     return_json_error('Conexão falhou: ' . $conn->connect_error);
 }
 
-if (empty($_POST['verification_code'])) {
-    return_json_error('Código de verificação é necessário.');
+if (empty($_POST['formData']) || empty($_POST['aesKey']) || empty($_POST['iv'])) {
+    return_json_error('Dados são obrigatórios.');
 }
 
 $privateKeyPath = '../chaves/private_key.pem';
@@ -44,13 +44,37 @@ try {
         throw new Exception('Falha ao carregar a chave privada. Erro: ' . $error);
     }
 
-    $encryptedCode = $_POST['verification_code'];
+    $encryptedFormData = $_POST['formData'];
+    $encryptedAesKey = $_POST['aesKey'];
+    $encryptedIv = $_POST['iv'];
 
-    $verificationCode = '';
+    $aesKey = '';
+    $iv = '';
 
-    if (!openssl_private_decrypt(base64_decode($encryptedCode), $verificationCode, $privateKey)) {
-        throw new Exception('Erro ao decriptar o código de verificação.');
+    if (!openssl_private_decrypt(base64_decode($encryptedAesKey), $aesKey, $privateKey)) {
+        throw new Exception('Erro ao decriptar a chave AES.');
     }
+
+    if (!openssl_private_decrypt(base64_decode($encryptedIv), $iv, $privateKey)) {
+        throw new Exception('Erro ao decriptar o IV.');
+    }
+
+    $aesKey = base64_decode($aesKey);
+    $iv = base64_decode($iv);
+
+    $decryptedFormData = openssl_decrypt(base64_decode($encryptedFormData), 'aes-256-cbc', $aesKey, OPENSSL_RAW_DATA, $iv);
+
+    if ($decryptedFormData === false) {
+        throw new Exception('Erro ao decriptar os dados do formulário com AES.');
+    }
+
+    $formData = json_decode($decryptedFormData, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Erro ao decodificar os dados do formulário JSON.');
+    }
+
+    $verificationCode = $formData['verification_code'];
 
     $userId = $_SESSION['login_user_id'] ?? '';
 

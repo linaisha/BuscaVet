@@ -4,7 +4,6 @@ include 'decode_cred.php';
 session_start();
 header('Content-Type: application/json');
 
-$certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
 
 function log_error($message) {
@@ -13,14 +12,11 @@ function log_error($message) {
 
 function return_json_error($message) {
     echo json_encode(['success' => false, 'message' => $message]);
+    ob_end_flush();
     exit;
 }
 
 try {
-    if (!file_exists($certPath)) {
-        throw new Exception('Certificado não encontrado no caminho especificado: ' . $certPath);
-    }
-
     if (!file_exists($privateKeyPath)) {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
@@ -38,23 +34,42 @@ try {
         throw new Exception('Falha ao carregar a chave privada. Erro: ' . $error);
     }
 
-    $encryptedEmail = $_POST['encrypted_email'] ?? '';
-    $encryptedPassword = $_POST['encrypted_password'] ?? '';
+    $encryptedFormData = $_POST['formData'] ?? '';
+    $encryptedAesKey = $_POST['aesKey'] ?? '';
+    $encryptedIv = $_POST['iv'] ?? '';
 
-    if (empty($encryptedEmail) || empty($encryptedPassword)) {
-        throw new Exception('Email e senha são obrigatórios.');
+    if (empty($encryptedFormData) || empty($encryptedAesKey) || empty($encryptedIv)) {
+        throw new Exception('Dados do formulário, chave AES e IV são obrigatórios.');
     }
 
-    $email = '';
-    $decryptedPassword = '';
+    $aesKey = '';
+    $iv = '';
 
-    if (!openssl_private_decrypt(base64_decode($encryptedEmail), $email, $privateKey)) {
-        throw new Exception('Erro ao decriptar o email.');
+    if (!openssl_private_decrypt(base64_decode($encryptedAesKey), $aesKey, $privateKey)) {
+        throw new Exception('Erro ao decriptar a chave AES.');
     }
 
-    if (!openssl_private_decrypt(base64_decode($encryptedPassword), $decryptedPassword, $privateKey)) {
-        throw new Exception('Erro ao decriptar a senha.');
+    if (!openssl_private_decrypt(base64_decode($encryptedIv), $iv, $privateKey)) {
+        throw new Exception('Erro ao decriptar o IV.');
     }
+
+    $aesKey = base64_decode($aesKey);
+    $iv = base64_decode($iv);
+
+    $decryptedFormData = openssl_decrypt(base64_decode($encryptedFormData), 'aes-256-cbc', $aesKey, OPENSSL_RAW_DATA, $iv);
+
+    if ($decryptedFormData === false) {
+        throw new Exception('Erro ao decriptar os dados do formulário com AES.');
+    }
+
+    $formData = json_decode($decryptedFormData, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Erro ao decodificar os dados do formulário JSON.');
+    }
+
+    $email = $formData['email'];
+    $password = $formData['password'];
 
     $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
@@ -80,10 +95,11 @@ try {
             echo json_encode(['success' => false, 'message' => 'Conta não confirmada. Por favor, verifique seu e-mail.']);
             $stmt->close();
             $conn->close();
+            ob_end_flush();
             exit;
         }
 
-        if (password_verify($decryptedPassword, $clinica['password'])) {
+        if (password_verify($password, $clinica['password'])) {
             $_SESSION['clinica_id'] = $clinica['id'];
             $_SESSION['login_clinica_email'] = $clinica['email'];
 
@@ -126,6 +142,8 @@ try {
     $conn->close();
 } catch (Exception $e) {
     log_error($e->getMessage());
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    return_json_error($e->getMessage());
 }
+
+ob_end_flush();
 ?>

@@ -1,18 +1,14 @@
 <?php
 include 'decode_cred.php';
 
-ob_start();
 session_start();
-
 header('Content-Type: application/json');
 
-function log_error($message)
-{
+function log_error($message) {
     error_log($message, 3, '../logs/php-error.log');
 }
 
-function return_json_error($message)
-{
+function return_json_error($message) {
     echo json_encode(['success' => false, 'message' => $message]);
     exit;
 }
@@ -28,19 +24,13 @@ if (empty($_POST['verification_code'])) {
     return_json_error('Código de verificação é necessário.');
 }
 
-$certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
 
 try {
-    if (!file_exists($certPath)) {
-        throw new Exception('Certificado não encontrado no caminho especificado: ' . $certPath);
-    }
-
     if (!file_exists($privateKeyPath)) {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
 
-    $publicKey = file_get_contents($certPath);
     $privateKeyContent = file_get_contents($privateKeyPath);
 
     if ($privateKeyContent === false) {

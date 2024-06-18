@@ -27,5 +27,4 @@ if ($token) {
 }
 
 $conn->close();
-
 ?>

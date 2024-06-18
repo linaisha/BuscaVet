@@ -1,39 +1,26 @@
 <?php
 include 'decode_cred.php';
 
-ob_start();
-ini_set('display_errors', 0);
-error_reporting(0);
-
 session_start();
 header('Content-Type: application/json');
 
-$certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
 
-
-function log_error($message)
-{
+function log_error($message) {
     error_log($message, 3, '../logs/php-error.log');
 }
 
-function return_json_error($message)
-{
+function return_json_error($message) {
     echo json_encode(['success' => false, 'message' => $message]);
     ob_end_flush();
     exit;
 }
 
 try {
-    if (!file_exists($certPath)) {
-        throw new Exception('Certificado não encontrado no caminho especificado: ' . $certPath);
-    }
-
     if (!file_exists($privateKeyPath)) {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }
 
-    $publicKey = file_get_contents($certPath);
     $privateKeyContent = file_get_contents($privateKeyPath);
 
     if ($privateKeyContent === false) {
@@ -140,5 +127,4 @@ try {
 }
 
 ob_end_flush();
-
 ?>

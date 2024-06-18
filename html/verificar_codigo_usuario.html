@@ -1,25 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8">
     <title>Verificar Código</title>
-    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0-beta.1/jsencrypt.min.js"></script>
-    <script src="../js/verificar_codigo_usuario.js"></script>
-  </head>
-  <body>
+    <script src="../js/verificar_codigo_usuario.js" defer></script>
+</head>
+<body>
     <div class="verification-container">
-      <h1>Verificar Código</h1>
-      <form id="verification-form" action="#">
-        <input
-          type="text"
-          id="verification-code"
-          name="verification_code"
-          placeholder="Insira o código de 6 dígitos"
-          required
-        />
-        <button type="submit">Verificar Código</button>
-      </form>
+        <h1>Verificar Código</h1>
+        <form id="verification-form">
+            <input type="text" id="verification-code" name="verification_code" placeholder="Insira o código de 6 dígitos" required>
+            <button type="submit">Verificar Código</button>
+        </form>
     </div>
-  </body>
+</body>
 </html>

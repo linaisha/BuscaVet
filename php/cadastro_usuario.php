@@ -14,46 +14,38 @@ use PHPMailer\PHPMailer\Exception;
 
 header('Content-Type: application/json');
 
-$certPath = '../chaves/certificate.pem';
 $privateKeyPath = '../chaves/private_key.pem';
 
-function log_error($message)
-{
+function log_error($message) {
     error_log($message, 3, '../logs/php-error.log');
 }
 
-function return_json_error($message)
-{
+function return_json_error($message) {
     echo json_encode(['success' => false, 'message' => $message]);
     ob_end_flush();
     exit;
 }
 
-function validarSenha($senha)
-{
+function validarSenha($senha) {
     $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
     return preg_match($regex, $senha);
 }
 
-function validarEmail($email)
-{
+function validarEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL);
 }
 
-function validarCpfCnpj($cpfCnpj)
-{
+function validarCpfCnpj($cpfCnpj) {
     $cleaned = preg_replace('/\D/', '', $cpfCnpj);
     return strlen($cleaned) === 11 || strlen($cleaned) === 14;
 }
 
-function validarDataNasc($data_nasc)
-{
+function validarDataNasc($data_nasc) {
     $regexData = '/^\d{4}-\d{2}-\d{2}$/';
     return preg_match($regexData, $data_nasc);
 }
 
-function enviarEmailConfirmacao($email, $token)
-{
+function enviarEmailConfirmacao($email, $token) {
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
@@ -80,10 +72,6 @@ function enviarEmailConfirmacao($email, $token)
 }
 
 try {
-    if (!file_exists($certPath)) {
-        throw new Exception('Certificado não encontrado no caminho especificado: ' . $certPath);
-    }
-
     if (!file_exists($privateKeyPath)) {
         throw new Exception('Chave privada não encontrada no caminho especificado: ' . $privateKeyPath);
     }

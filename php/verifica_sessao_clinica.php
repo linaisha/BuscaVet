@@ -12,6 +12,6 @@ $userName = htmlspecialchars($_SESSION['clinica_name']);
 $_SESSION['LAST_ACTIVITY'] = time();
 setcookie("userName", htmlspecialchars($_SESSION['clinica_name']), time() + 30);
 
-header('Location: ../html/pagina_segura_clinica.html');
+header('Location:../html/pagina_segura_clinica.html');
 exit;
 ?>

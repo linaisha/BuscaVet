@@ -34,23 +34,42 @@ try {
         throw new Exception('Falha ao carregar a chave privada. Erro: ' . $error);
     }
 
-    $encryptedEmail = $_POST['email'] ?? '';
-    $encryptedPassword = $_POST['password'] ?? '';
+    $encryptedFormData = $_POST['formData'] ?? '';
+    $encryptedAesKey = $_POST['aesKey'] ?? '';
+    $encryptedIv = $_POST['iv'] ?? '';
 
-    if (empty($encryptedEmail) || empty($encryptedPassword)) {
-        throw new Exception('Email e senha são obrigatórios.');
+    if (empty($encryptedFormData) || empty($encryptedAesKey) || empty($encryptedIv)) {
+        throw new Exception('Dados do formulário, chave AES e IV são obrigatórios.');
     }
 
-    $email = '';
-    $decryptedPassword = '';
+    $aesKey = '';
+    $iv = '';
 
-    if (!openssl_private_decrypt(base64_decode($encryptedEmail), $email, $privateKey)) {
-        throw new Exception('Erro ao decriptar o email.');
+    if (!openssl_private_decrypt(base64_decode($encryptedAesKey), $aesKey, $privateKey)) {
+        throw new Exception('Erro ao decriptar a chave AES.');
     }
 
-    if (!openssl_private_decrypt(base64_decode($encryptedPassword), $decryptedPassword, $privateKey)) {
-        throw new Exception('Erro ao decriptar a senha.');
+    if (!openssl_private_decrypt(base64_decode($encryptedIv), $iv, $privateKey)) {
+        throw new Exception('Erro ao decriptar o IV.');
     }
+
+    $aesKey = base64_decode($aesKey);
+    $iv = base64_decode($iv);
+
+    $decryptedFormData = openssl_decrypt(base64_decode($encryptedFormData), 'aes-256-cbc', $aesKey, OPENSSL_RAW_DATA, $iv);
+
+    if ($decryptedFormData === false) {
+        throw new Exception('Erro ao decriptar os dados do formulário com AES.');
+    }
+
+    $formData = json_decode($decryptedFormData, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Erro ao decodificar os dados do formulário JSON.');
+    }
+
+    $email = $formData['email'];
+    $password = $formData['password'];
 
     $conn = new mysqli($credentials['servername'], $credentials['username'], $credentials['password'], $credentials['database']);
 
@@ -80,7 +99,7 @@ try {
             exit;
         }
 
-        if (password_verify($decryptedPassword, $user['password'])) {
+        if (password_verify($password, $user['password'])) {
             $_SESSION['login_user_id'] = $user['id'];
             $_SESSION['login_user_email'] = $user['email'];
 
